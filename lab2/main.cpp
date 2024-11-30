@@ -1,12 +1,38 @@
 
 #include <iostream>
 #include <cassert>
+#include <fstream>
 
 #include "Registro.hpp"
+#include "Buffer.hpp"
 
 const int MAX_NOME = 60;
 
 using namespace std;
+
+void testBuffer() {
+    // Cria um objeto Registro e define os valores dos atributos
+    Registro reg1;
+    reg1.nome = "Joao";
+    reg1.idade = 25;
+
+    // Abre um arquivo para escrita
+    ofstream outFile("teste_registro.dat", ios::binary);
+    Buffer buffer;
+    buffer.escreverRegistroFixo(reg1, outFile);
+    outFile.close();
+
+    // Abre o arquivo para leitura
+    ifstream inFile("teste_registro.dat", ios::binary);
+    Registro reg2 = buffer.lerRegistroFixo(inFile);
+    inFile.close();
+
+    // Verifica se os valores dos atributos foram preservados
+    assert(reg2.nome == "Joao");
+    assert(reg2.idade == 25);
+
+    cout << "Buffer::Todos os testes passaram!" << endl;
+}
 
 void testRegistro() {
     // Cria um objeto Registro e define os valores dos atributos
@@ -41,7 +67,7 @@ void testRegistro() {
     assert(reg4.nome == std::string("NomeMuitoGrandeParaTestarSeFuncionaCorretamente").substr(0, MAX_NOME));
     assert(reg4.idade == 30);
 
-    cout << "Todos os testes passaram!" << endl;
+    cout << "Registro::Todos os testes passaram!" << endl;
 }
 
 
@@ -49,5 +75,6 @@ int main()
 {
     // Registro r1;
     testRegistro();
+    testBuffer();
     return 0;
 }
