@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstring>
+#include <string.h>
 
 using namespace std;
 
@@ -15,6 +16,9 @@ string Registro::packFixed() {
 }
 
 void Registro::unpackFixed(string buffer) {
-    nome = string(buffer.c_str(),strnlen(buffer.c_str(),MAX_NOME));
+    size_t lenght = buffer.find('\0', 0);
+    if(lenght == string::npos || lenght > MAX_NOME)
+        lenght = MAX_NOME;
+    nome = string(buffer.c_str(), lenght);
     memcpy(&idade, &buffer[MAX_NOME],sizeof(int));
 }
