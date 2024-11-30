@@ -9,12 +9,12 @@ const int MAX_NOME = 60;
 
 void Buffer::escreverRegistroFixo(Registro reg, ofstream& out){
     string buffer = reg.packFixed();
-    out.write(buffer.c_str(), buffer.size());
+    out.write(reinterpret_cast<const char*>(buffer.c_str()), buffer.size());
 }
 
 Registro Buffer::lerRegistroFixo(ifstream& in){
     string buffer(MAX_NOME + sizeof(int),'\0');
-    in.read(&buffer[0], buffer.size());
+    in.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
     Registro reg;
     reg.unpackFixed(buffer);
     return reg;
