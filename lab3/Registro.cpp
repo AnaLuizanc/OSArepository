@@ -20,8 +20,15 @@ string Registro::packFixed() const {
 }
 
 void Registro::unpackFixed(const string& buffer) {
-    nome = string(buffer.c_str(), strnlen(buffer.c_str(), MAX_NOME));
-    sobrenome = string(buffer.c_str() + MAX_NOME, strnlen(buffer.c_str() + MAX_NOME, MAX_SOBRENOME));
-    telefone = string(buffer.c_str() + MAX_NOME + MAX_SOBRENOME, strnlen(buffer.c_str() + MAX_NOME + MAX_SOBRENOME, MAX_TELEFONE));
-    nascimento = string(buffer.c_str() + MAX_NOME + MAX_SOBRENOME + MAX_TELEFONE, strnlen(buffer.c_str() + MAX_NOME + MAX_SOBRENOME + MAX_TELEFONE, MAX_NASCIMENTO));
+    auto extractFixedString = [](const string& buffer, size_t offset, size_t maxLength) -> string {
+        size_t end = buffer.find('\0', offset);
+        if (end == string::npos || end > offset + maxLength) 
+            end = offset + maxLength;
+        return buffer.substr(offset, end - offset);
+    };
+
+    nome = extractFixedString(buffer, 0, MAX_NOME);
+    sobrenome = extractFixedString(buffer, MAX_NOME, MAX_SOBRENOME);
+    telefone = extractFixedString(buffer, MAX_NOME + MAX_SOBRENOME, MAX_TELEFONE);
+    nascimento = extractFixedString(buffer, MAX_NOME + MAX_SOBRENOME + MAX_TELEFONE, MAX_NASCIMENTO);
 }

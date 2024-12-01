@@ -30,7 +30,7 @@ int main()
     }
 
     assert(registros.size() == registrosLidos.size());
-    for (int i = 0; i < registros.size(); ++i) {
+    for (unsigned i = 0; i < registros.size(); ++i) {
         assert(registros[i].nome == registrosLidos[i].nome);
         assert(registros[i].sobrenome == registrosLidos[i].sobrenome);
         assert(registros[i].telefone == registrosLidos[i].telefone);
