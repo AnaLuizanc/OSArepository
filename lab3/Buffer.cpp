@@ -11,7 +11,7 @@ const int MAX_SOBRENOME = 30;
 const int MAX_TELEFONE = 15;
 const int MAX_NASCIMENTO = 10;
 
-Buffer::Buffer(const string& nomeArquivo) : nomeArquivo(nomeArquivo) {}
+Buffer::Buffer(const string& nomeArquivo) : nomeArquivo(nomeArquivo), inFile(nomeArquivo, ios::binary) {}
 
 void Buffer::escreverRegistroFixo(const Registro& reg){
     ofstream outFile(nomeArquivo, ios::binary | ios::app);
@@ -23,30 +23,28 @@ void Buffer::escreverRegistroFixo(const Registro& reg){
 }
 
 Registro Buffer::lerRegistroFixo(){
-    ifstream inFile(nomeArquivo, ios::binary);
     Registro reg;
     if(inFile.is_open()){
         buffer.resize(MAX_NOME + MAX_SOBRENOME + MAX_TELEFONE + MAX_NASCIMENTO, '\0');
         inFile.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
         if(inFile.gcount() > 0)
             reg.unpackFixed(buffer);
-        inFile.close();
     }
     return reg;
 }
 
 vector<Registro> Buffer::lerRegistrosTxt(){
     vector<Registro> registros;
-    ifstream infile(nomeArquivo);
-    if(infile.is_open()){
+    ifstream inFile(nomeArquivo);
+    if(inFile.is_open()){
         string line;
-        while(getline(infile, line)){
+        while(getline(inFile, line)){
             stringstream ss(line);
             string nome, sobrenome, telefone, nascimento;
             getline(ss, nome, '|');
             getline(ss, sobrenome, '|');
             getline(ss, telefone, '|');
-            getline(ss, nascimento, '\n');
+            getline(ss, nascimento);
             Registro reg;
             reg.nome = nome;
             reg.sobrenome = sobrenome;
@@ -54,7 +52,11 @@ vector<Registro> Buffer::lerRegistrosTxt(){
             reg.nascimento = nascimento;
             registros.push_back(reg);
         }
-        infile.close();
+        inFile.close();
     }
     return registros;
+}
+
+bool Buffer::temRegistros(){
+    return inFile.is_open() && !inFile.eof();
 }
