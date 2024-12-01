@@ -20,8 +20,8 @@ string Registro::packFixed() const {
 }
 
 void Registro::unpackFixed(const string& buffer) {
-    auto extractFixedString = [](const string& buffer, size_t offset, size_t maxLength) -> string {
-        size_t end = buffer.find('\0', offset);
+    auto extractFixedString = [](const string& buffer, unsigned offset, unsigned maxLength) -> string {
+        unsigned end = buffer.find('\0', offset);
         if (end == string::npos || end > offset + maxLength) 
             end = offset + maxLength;
         return buffer.substr(offset, end - offset);

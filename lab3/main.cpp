@@ -37,7 +37,5 @@ int main()
         assert(registros[i].nascimento == registrosLidos[i].nascimento);
     }
 
-    cout << "Todos os testes passaram!" << endl;
-
     return 0;
 }
