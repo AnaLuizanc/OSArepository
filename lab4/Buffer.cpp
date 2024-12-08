@@ -1,4 +1,5 @@
 #include "Buffer.hpp"
+#include "Indice.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -12,16 +13,20 @@ void Buffer::escreverRegistroFixo(const Livro& reg){
     ofstream outFile(nomeArquivo, ios::binary | ios::app);
     if(outFile.is_open()){
         string buffer = reg.packFixed();
-        size_t dataSize = buffer.size();
+        unsigned dataSize = buffer.size();
+        long endereco = outFile.tellp();
         outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
         outFile.write(buffer.c_str(), dataSize);
         outFile.close();
+
+        Indice indice(reg.id, endereco);
+        escreverIndice(indice);
     }
 }
 
 Livro Buffer::lerRegistroFixo(){
     if(inFile){
-        size_t dataSize;
+        unsigned dataSize;
         inFile.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
         if(inFile.eof())
             return Livro();
@@ -32,6 +37,7 @@ Livro Buffer::lerRegistroFixo(){
         
         return reg;
     }
+    return Livro();
 }
 
 vector<Livro> Buffer::lerRegistrosCSV(){
@@ -65,5 +71,29 @@ vector<Livro> Buffer::lerRegistrosCSV(){
         csvFile.close();
         
         return livros;
+    }
+}
+
+void Buffer::escreverIndice(const Indice& indice){
+    ofstream outFile("indices.bin", ios::binary | ios::app);
+    if(outFile.is_open()){
+        string buffer = indice.packFixed();
+        outFile.write(buffer.c_str(), buffer.size());
+        outFile.close();
+    }
+}
+
+vector<Indice> Buffer::lerIndices(){
+    ifstream inFile("indices.bin", ios::binary);
+    if(inFile){
+        vector<Indice> indices;
+        string line;
+        while(getline(inFile, line)){
+            Indice indice;
+            indice.unpackFixed(line);
+            indices.push_back(indice);
+        }
+        inFile.close();
+        return indices;
     }
 }
