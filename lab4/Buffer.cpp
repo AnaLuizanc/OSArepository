@@ -1,9 +1,10 @@
 #include "Buffer.hpp"
-//#include "Indice.hpp"
+#include "Indice.hpp"
 
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <utility>
 
 using namespace std;
 
@@ -12,15 +13,15 @@ Buffer::Buffer(const string& nomeArquivo) : nomeArquivo(nomeArquivo), inFile(nom
 void Buffer::escreverRegistro(const Livro& reg){
     ofstream outFile(nomeArquivo, ios::binary | ios::app);
     if(outFile.is_open()){
+        long endereco = outFile.tellp();
         string buffer = reg.packFixed();
         unsigned dataSize = buffer.size();
-        //long endereco = outFile.tellp();
         outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
         outFile.write(buffer.c_str(), dataSize);
         outFile.close();
 
-        //Indice indice(reg.id, endereco);
-        //escreverIndice(indice);
+        Indice indice(reg.id, endereco);
+        escreverIndice(indice);
     }
 }
 
@@ -37,14 +38,16 @@ Livro Buffer::lerRegistro(){
         
         return reg;
     }
-    //return Livro();
+    return Livro();
 }
 
-vector<Livro> Buffer::lerRegistrosCSV(){
+pair<vector<Livro>, vector<Indice>> Buffer::lerRegistrosCSV(){
     ifstream csvFile(nomeArquivo);
     if(csvFile){
         vector<Livro> livros;
+        vector<Indice> indices;
         string line;
+        int endereco = 0;
         while(getline(csvFile,line)){
             stringstream ss(line);
             string field;
@@ -67,36 +70,46 @@ vector<Livro> Buffer::lerRegistrosCSV(){
                 liv.generos.push_back(genero);
             
             livros.push_back(liv);
+
+            Indice indice(liv.id, endereco++);
+            indices.push_back(indice);
         }
         csvFile.close();
         
-        return livros;
+        return make_pair(livros, indices);
     }
 }
 
-// void Buffer::escreverIndice(const Indice& indice){
-//     ofstream outFile("indices.bin", ios::binary | ios::app);
-//     if(outFile.is_open()){
-//         string buffer = indice.packFixed();
-//         outFile.write(buffer.c_str(), buffer.size());
-//         outFile.close();
-//     }
-// }
+void Buffer::escreverIndice(const Indice& indice){
+    ofstream outFile("indices.bin", ios::binary | ios::app);
+    if(outFile){
+        string packedData = indice.packFixed();
+        size_t dataSize = packedData.size();
+        outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
+        outFile.write(packedData.c_str(), dataSize);
+        outFile.close();
+    }
+}
 
-// vector<Indice> Buffer::lerIndices(){
-//     ifstream inFile("indices.bin", ios::binary);
-//     if(inFile){
-//         vector<Indice> indices;
-//         string line;
-//         while(getline(inFile, line)){
-//             Indice indice;
-//             indice.unpackFixed(line);
-//             indices.push_back(indice);
-//         }
-//         inFile.close();
-//         return indices;
-//     }
-// }
+vector<Indice> Buffer::lerIndices(){
+    ifstream inFile("indices.bin", ios::binary);
+    vector<Indice> indices;
+    while(true){
+        size_t dataSize;
+        inFile.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
+        if(inFile.eof())
+            break;
+        string buffer(dataSize, '\0');
+        inFile.read(&buffer[0], dataSize);
+        if(inFile.eof())
+            break;
+        Indice indice;
+        indice.unpackFixed(buffer);
+        indices.push_back(indice);
+    }
+    inFile.close();
+    return indices;
+}
 
 // bool Buffer::temRegistros(){
 //     return inFile.is_open() && !inFile.eof();

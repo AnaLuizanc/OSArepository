@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <fstream>
+#include <utility>
 
 class Buffer {
     public:
@@ -17,7 +18,7 @@ class Buffer {
 
         void escreverRegistro(const Livro& reg);
         Livro lerRegistro();
-        vector<Livro> lerRegistrosCSV();
+        pair<vector<Livro>, vector<Indice>> lerRegistrosCSV();
         void escreverIndice(const Indice& indice);
         vector<Indice> lerIndices();
         bool temRegistros();
