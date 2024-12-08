@@ -1,5 +1,5 @@
 #include "Buffer.hpp"
-#include "Indice.hpp"
+//#include "Indice.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -9,22 +9,22 @@ using namespace std;
 
 Buffer::Buffer(const string& nomeArquivo) : nomeArquivo(nomeArquivo), inFile(nomeArquivo, ios::binary) {}
 
-void Buffer::escreverRegistroFixo(const Livro& reg){
+void Buffer::escreverRegistro(const Livro& reg){
     ofstream outFile(nomeArquivo, ios::binary | ios::app);
     if(outFile.is_open()){
         string buffer = reg.packFixed();
         unsigned dataSize = buffer.size();
-        long endereco = outFile.tellp();
+        //long endereco = outFile.tellp();
         outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
         outFile.write(buffer.c_str(), dataSize);
         outFile.close();
 
-        Indice indice(reg.id, endereco);
-        escreverIndice(indice);
+        //Indice indice(reg.id, endereco);
+        //escreverIndice(indice);
     }
 }
 
-Livro Buffer::lerRegistroFixo(){
+Livro Buffer::lerRegistro(){
     if(inFile){
         unsigned dataSize;
         inFile.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
@@ -37,7 +37,7 @@ Livro Buffer::lerRegistroFixo(){
         
         return reg;
     }
-    return Livro();
+    //return Livro();
 }
 
 vector<Livro> Buffer::lerRegistrosCSV(){
@@ -74,26 +74,30 @@ vector<Livro> Buffer::lerRegistrosCSV(){
     }
 }
 
-void Buffer::escreverIndice(const Indice& indice){
-    ofstream outFile("indices.bin", ios::binary | ios::app);
-    if(outFile.is_open()){
-        string buffer = indice.packFixed();
-        outFile.write(buffer.c_str(), buffer.size());
-        outFile.close();
-    }
-}
+// void Buffer::escreverIndice(const Indice& indice){
+//     ofstream outFile("indices.bin", ios::binary | ios::app);
+//     if(outFile.is_open()){
+//         string buffer = indice.packFixed();
+//         outFile.write(buffer.c_str(), buffer.size());
+//         outFile.close();
+//     }
+// }
 
-vector<Indice> Buffer::lerIndices(){
-    ifstream inFile("indices.bin", ios::binary);
-    if(inFile){
-        vector<Indice> indices;
-        string line;
-        while(getline(inFile, line)){
-            Indice indice;
-            indice.unpackFixed(line);
-            indices.push_back(indice);
-        }
-        inFile.close();
-        return indices;
-    }
-}
+// vector<Indice> Buffer::lerIndices(){
+//     ifstream inFile("indices.bin", ios::binary);
+//     if(inFile){
+//         vector<Indice> indices;
+//         string line;
+//         while(getline(inFile, line)){
+//             Indice indice;
+//             indice.unpackFixed(line);
+//             indices.push_back(indice);
+//         }
+//         inFile.close();
+//         return indices;
+//     }
+// }
+
+// bool Buffer::temRegistros(){
+//     return inFile.is_open() && !inFile.eof();
+// }

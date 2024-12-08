@@ -15,11 +15,12 @@ class Buffer {
 
         Buffer(const string& nomeArquivo);
 
-        void escreverRegistroFixo(const Livro& reg);
-        Livro lerRegistroFixo();
+        void escreverRegistro(const Livro& reg);
+        Livro lerRegistro();
         vector<Livro> lerRegistrosCSV();
         void escreverIndice(const Indice& indice);
         vector<Indice> lerIndices();
+        bool temRegistros();
 };
 
 #endif
