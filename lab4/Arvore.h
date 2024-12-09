@@ -69,6 +69,8 @@ class ArvoreBinaria
         string Travessia_Profundidade();
         string Travessia_Largura();
 
+        TIPO* Buscar(const TIPO& item) const;
+        Nodo<TIPO>* buscarRecursivo(Nodo<TIPO>* nodo, const TIPO& item) const;
 
 };
 
@@ -89,7 +91,7 @@ void ArvoreBinaria<TIPO>::Print(Nodo<TIPO> *n)
     if ( n!= NULL )
     {
         Print(n->esq);
-        cout<<n->item<<" ";
+        cout<<n->item<<" " << endl;
         Print(n->dir);
     }
 }
@@ -134,6 +136,26 @@ bool ArvoreBinaria<TIPO>::Pesquisar(TIPO valor, Nodo<TIPO>* n)
         return Pesquisar(valor, n->dir);
     else
         return Pesquisar(valor, n->esq);
+}
+
+template <class TIPO>
+TIPO* ArvoreBinaria<TIPO>::Buscar(const TIPO& item) const {
+    Nodo<TIPO>* nodo = buscarRecursivo(raiz, item);
+    if (nodo != nullptr) {
+        return &nodo->item;
+    }
+    return nullptr;
+}
+
+template <class TIPO>
+Nodo<TIPO>* ArvoreBinaria<TIPO>::buscarRecursivo(Nodo<TIPO>* nodo, const TIPO& item) const {
+    if (nodo == nullptr || nodo->item == item) {
+        return nodo;
+    } else if (item < nodo->item) {
+        return buscarRecursivo(nodo->esq, item);
+    } else {
+        return buscarRecursivo(nodo->dir, item);
+    }
 }
 
 template <class TIPO>

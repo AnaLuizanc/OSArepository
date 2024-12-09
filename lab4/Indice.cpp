@@ -2,13 +2,14 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 Indice::Indice() : id(0), endereco(0) {}
 Indice::Indice(int id, long endereco) : id(id), endereco(endereco) {}
 
 string Indice::packFixed() const {
     stringstream ss;
-    ss << id << " " << endereco << " ";
+    ss << setw(10) << setfill('0') << id << " " << setw(10) << setfill('0') << endereco << " ";
     return ss.str();
 }
 
