@@ -21,7 +21,7 @@ class Buffer {
         pair<vector<Livro>, vector<Indice>> lerRegistrosCSV();
         void escreverIndice(const Indice& indice);
         vector<Indice> lerIndices();
-        bool temRegistros();
+        Livro lerRegistroPorEndereco(long endereco);
 };
 
 #endif

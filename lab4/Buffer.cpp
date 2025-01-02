@@ -15,7 +15,7 @@ void Buffer::escreverRegistro(const Livro& reg){
     if(outFile.is_open()){
         long endereco = outFile.tellp();
         string buffer = reg.packFixed();
-        unsigned dataSize = buffer.size();
+        size_t dataSize = buffer.size();
         outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
         outFile.write(buffer.c_str(), dataSize);
         outFile.close();
@@ -26,16 +26,18 @@ void Buffer::escreverRegistro(const Livro& reg){
 }
 
 Livro Buffer::lerRegistro(){
-    if(inFile){
-        unsigned dataSize;
+    if (!inFile.is_open())
+        inFile.open(nomeArquivo, ios::binary);
+    if(inFile.is_open()){
+        size_t dataSize;
         inFile.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
-        if(inFile.eof())
+        if(inFile.eof() || dataSize == 0)
             return Livro();
         string buffer(dataSize, '\0');
         inFile.read(&buffer[0], dataSize);
         Livro reg;
         reg.unpackFixed(buffer);
-        
+
         return reg;
     }
     return Livro();
@@ -78,15 +80,16 @@ pair<vector<Livro>, vector<Indice>> Buffer::lerRegistrosCSV(){
         
         return make_pair(livros, indices);
     }
+    return make_pair(vector<Livro>(), vector<Indice>());
 }
 
 void Buffer::escreverIndice(const Indice& indice){
-    ofstream outFile("indices.bin", ios::binary | ios::app);
+    ofstream outFile(nomeArquivo, ios::binary | ios::app);
     if(outFile){
-        string packedData = indice.packFixed();
-        size_t dataSize = packedData.size();
+        string buffer = indice.packFixed();
+        size_t dataSize = buffer.size();
         outFile.write(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
-        outFile.write(packedData.c_str(), dataSize);
+        outFile.write(buffer.c_str(), dataSize);
         outFile.close();
     }
 }
@@ -110,7 +113,3 @@ vector<Indice> Buffer::lerIndices(){
     inFile.close();
     return indices;
 }
-
-// bool Buffer::temRegistros(){
-//     return inFile.is_open() && !inFile.eof();
-// }
