@@ -11,6 +11,8 @@ const int MAX_SOBRENOME = 30;
 const int MAX_TELEFONE = 15;
 const int MAX_NASCIMENTO = 10;
 
+ofstream file("texto.txt", ios::out | ios::app);
+
 Buffer::Buffer(const string& nomeArquivo) : nomeArquivo(nomeArquivo), inFile(nomeArquivo, ios::binary) {}
 
 void Buffer::escreverRegistroFixo(const Registro& reg){
