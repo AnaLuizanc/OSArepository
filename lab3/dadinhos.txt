@@ -1,0 +1,7 @@
+Nome|Sobrenome|Telefone|Nascimento
+Dominic Norris|Franklin|(40) 42272-1137|03/03/1971
+Brian Mccarthy|Odonnell|(90) 80886-9288|13/04/1979
+Garrison Witt|Robbins|(78) 22701-5394|09/09/1998
+Hop Hensley|Abbott|(29) 69684-0147|01/01/1970
+Keegan Richard|Wood|(76) 30723-6872|24/09/1968
+Lucy Kelly|Solis|(44) 12429-1440|03/07/1997
