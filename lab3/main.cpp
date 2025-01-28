@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cstring>
 
 using namespace std;
 
@@ -15,8 +16,20 @@ class Registro {
         string nascimento;
 
         string packFixed() const{
-            size_t tamanho = nome.length() + sobrenome.length() + telefone.length() + nascimento.length();
-            return "a";
+            string data = "|" + nome + "|" + sobrenome + "|" + telefone + "|" + nascimento;
+            string buffer(data.size(), '\0');
+
+            ofstream saidaTxt;
+            saidaTxt.open("saidapack.txt", ios_base::app);
+
+            saidaTxt << data.size() << data << endl;
+
+            strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(int));
+            strncpy(&buffer[sizeof(int)], data.c_str(), data.size());
+
+            saidaTxt.close();
+
+            return buffer;
         }
 
         void unpackFixed(const string& buffer){
@@ -27,7 +40,7 @@ class Registro {
 class Buffer {
     public:
         string fileName;
-        Registro buffer;
+        string buffer;
 
         Buffer(const string& fileName){
             this->fileName = fileName;
@@ -61,6 +74,18 @@ class Buffer {
             }
             return registros;
         }
+
+        void escreverRegistroFixo(const Registro& reg){
+            ofstream saidaBinario(fileName, ios::binary | ios::app);
+
+            buffer = reg.packFixed();
+            size_t tamanho = buffer.size();
+
+            saidaBinario.write(reinterpret_cast<const char*>(&tamanho), sizeof(tamanho));
+            saidaBinario.write(buffer.c_str(), tamanho);
+            
+            saidaBinario.close();
+        }
 };
 
 //------------ESPAÇO PARA FUNÇÕES AUXILIARES------------//
@@ -88,20 +113,27 @@ void escreveNoArquivo(ofstream& saida, vector<Registro> regs){
 int main(){
 
     ifstream arquivo; //arquivo menor de teste
-    arquivo.open("dadinhos.txt", ios_base::in); //abre pra leitura
+    arquivo.open("Dadinhos.txt", ios_base::in); //abre pra leitura
     
     ofstream saida;
     saida.open("saida.txt", ios_base::in);
 
     vector<Registro> regs;
 
-    Buffer buffer("dadinhos.txt");
-    regs = buffer.lerRegistrosTxt();
+    Buffer bufferTxt("Dadinhos.txt");
+    regs = bufferTxt.lerRegistrosTxt();
+
+    Buffer bufferBin("saida.dat");
+
 
     cout << regs.size() << endl;
 
-    imprimeRegs(regs);
-    escreveNoArquivo(saida, regs);
+    // imprimeRegs(regs);
+    // escreveNoArquivo(saida, regs);
+
+    for(int i=0; i<regs.size(); i++){
+        bufferBin.escreverRegistroFixo(regs[i]);
+    }
 
 
     return 0;
