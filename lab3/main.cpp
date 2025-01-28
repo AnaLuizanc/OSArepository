@@ -116,7 +116,7 @@ int main(){
     arquivo.open("Dadinhos.txt", ios_base::in); //abre pra leitura
     
     ofstream saida;
-    saida.open("saida.txt", ios_base::in);
+    saida.open("saida.txt", ios_base::out); //abre para escrita
 
     vector<Registro> regs;
 
@@ -124,9 +124,6 @@ int main(){
     regs = bufferTxt.lerRegistrosTxt();
 
     Buffer bufferBin("saida.dat");
-
-
-    cout << regs.size() << endl;
 
     // imprimeRegs(regs);
     // escreveNoArquivo(saida, regs);
