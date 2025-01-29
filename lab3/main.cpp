@@ -12,7 +12,7 @@ using namespace std;
 //------------ESPAÇO PARA FUNÇÕES AUXILIARES------------//
 
 void imprimeRegs(vector<Registro> regs){
-    for(int i=0; i<regs.size(); i++){
+    for(unsigned i=0; i<regs.size(); i++){
         cout << regs[i].nome << " - ";
         cout << regs[i].sobrenome << " - ";
         cout << regs[i].telefone << " - ";
@@ -21,7 +21,7 @@ void imprimeRegs(vector<Registro> regs){
 }
 
 void escreveNoArquivo(ofstream& saida, vector<Registro> regs){
-    for(int i=0; i<regs.size(); i++){
+    for(unsigned i=0; i<regs.size(); i++){
         saida << regs[i].nome << " - ";
         saida << regs[i].sobrenome << " - ";
         saida << regs[i].telefone << " - ";
@@ -46,7 +46,7 @@ int main(){
 
     Buffer bufferBin("SAIDA.bin");
 
-    for(int i=0; i<regs.size(); i++)
+    for(unsigned i=0; i<regs.size(); i++)
         bufferBin.escreverRegistroFixo(regs[i]);
 
     // registros lidos do arquivo binário
