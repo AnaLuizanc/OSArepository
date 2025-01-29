@@ -34,10 +34,24 @@ class Registro {
         }
 
         void unpackFixed(const string& buffer){
-            cout << buffer.size() << " - " << buffer << endl;
+            int bufferSize = buffer.size();
+            int delimiter = buffer.find('|', 0);
+            string bufferAux = buffer.substr(delimiter+1, bufferSize);
 
-            int lenght = buffer.find('|', 1);
-            cout << lenght;
+            delimiter = bufferAux.find('|', 0);
+            nome = bufferAux.substr(0, delimiter);
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            sobrenome = bufferAux.substr(0, delimiter);
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            telefone = bufferAux.substr(0, delimiter);
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            nascimento = bufferAux.substr(0, delimiter);
         }
 };
 
@@ -91,27 +105,28 @@ class Buffer {
             saidaBinario.close();
         }
 
-        Registro lerRegistroFixo(){
+        vector<Registro> lerRegistroFixo(){
+            vector<Registro> registros;
             ifstream arquivoBin(fileName, ios_base::binary | ios_base::in);
-            short int tamanhoReg;
-            arquivoBin.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+            while(arquivoBin.peek() != EOF){
+                short int tamanhoReg;
 
-                cout << endl << endl << tamanhoReg << endl;
+                arquivoBin.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+                if(arquivoBin.eof()) break;
 
-            string buffer(tamanhoReg, '\0');
-                
-                cout << buffer.size() << endl;
+                string buffer(tamanhoReg, '\0');
 
-            arquivoBin.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+                if(arquivoBin.eof()) break;
+                arquivoBin.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
 
-                //cout << "." << buffer << "." << endl;
-            
-            Registro reg;
-            cout << endl << "DENTRO DE UNPACK" << endl;
-            reg.unpackFixed(buffer);
+                Registro reg;
+                reg.unpackFixed(buffer);
+                registros.push_back(reg);
+            }
 
             arquivoBin.close();
-            return reg;
+            
+            return registros;
         }
 };
 
@@ -145,7 +160,7 @@ int main(){
     ofstream saida;
     saida.open("saida.txt", ios_base::out); //abre para escrita
 
-    vector<Registro> regs;
+    vector<Registro> regs; // lidos dos arquivo txt
 
     Buffer bufferTxt("Dadinhos.txt");
     regs = bufferTxt.lerRegistrosTxt();
@@ -159,10 +174,11 @@ int main(){
         bufferBin.escreverRegistroFixo(regs[i]);
     }
 
-    Registro reg;
+    // registros lidos do arquivo binário
+    vector<Registro> registrosLidos = bufferBin.lerRegistroFixo();
 
-    reg = bufferBin.lerRegistroFixo();
-
+    cout << "Há " << registrosLidos.size() << " registros lidos." << endl;
+    imprimeRegs(registrosLidos);
 
     return 0;
 }
