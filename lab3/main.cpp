@@ -24,8 +24,9 @@ class Registro {
 
             saidaTxt << data.size() << data << endl;
 
-            strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(int));
-            strncpy(&buffer[sizeof(int)], data.c_str(), data.size());
+            buffer.resize(data.size() + sizeof(short int), '\0');
+            strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(short int));
+            strncpy(&buffer[sizeof(short int)], data.c_str(), data.size());
 
             saidaTxt.close();
 
@@ -33,7 +34,10 @@ class Registro {
         }
 
         void unpackFixed(const string& buffer){
+            cout << buffer.size() << " - " << buffer << endl;
 
+            int lenght = buffer.find('|', 1);
+            cout << lenght;
         }
 };
 
@@ -79,12 +83,35 @@ class Buffer {
             ofstream saidaBinario(fileName, ios::binary | ios::app);
 
             buffer = reg.packFixed();
-            size_t tamanho = buffer.size();
+            short int tamanho = buffer.size();
 
             saidaBinario.write(reinterpret_cast<const char*>(&tamanho), sizeof(tamanho));
             saidaBinario.write(buffer.c_str(), tamanho);
             
             saidaBinario.close();
+        }
+
+        Registro lerRegistroFixo(){
+            ifstream arquivoBin(fileName, ios_base::binary | ios_base::in);
+            short int tamanhoReg;
+            arquivoBin.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+
+                cout << endl << endl << tamanhoReg << endl;
+
+            string buffer(tamanhoReg, '\0');
+                
+                cout << buffer.size() << endl;
+
+            arquivoBin.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+
+                //cout << "." << buffer << "." << endl;
+            
+            Registro reg;
+            cout << endl << "DENTRO DE UNPACK" << endl;
+            reg.unpackFixed(buffer);
+
+            arquivoBin.close();
+            return reg;
         }
 };
 
@@ -131,6 +158,10 @@ int main(){
     for(int i=0; i<regs.size(); i++){
         bufferBin.escreverRegistroFixo(regs[i]);
     }
+
+    Registro reg;
+
+    reg = bufferBin.lerRegistroFixo();
 
 
     return 0;
