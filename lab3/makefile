@@ -64,5 +64,7 @@ clean:
 	@echo Cleanup complete!!!
 
 run: all
+	rm -rf *.bin
+	rm -rf *.dat
 	./$(OUTPUTMAIN)
 	@echo Executing 'all' complete!!!
