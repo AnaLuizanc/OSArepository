@@ -5,7 +5,7 @@ string Registro::packFixed() const{
     string buffer(data.size(), '\0');
 
     ofstream saidaTxt;
-    saidaTxt.open("saidapack.txt", ios_base::app);
+    saidaTxt.open("saidapack.dat", ios_base::app);
 
     saidaTxt << data.size() << data << endl;
 

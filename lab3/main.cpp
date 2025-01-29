@@ -34,7 +34,7 @@ void escreveNoArquivo(ofstream& saida, vector<Registro> regs){
 int main(){
 
     ofstream saida;
-    saida.open("SAIDA.txt", ios_base::out); //abre para escrita
+    saida.open("SAIDA.dat", ios_base::out); //abre para escrita
 
     vector<Registro> regs; // lidos do arquivo txt
 
@@ -44,7 +44,7 @@ int main(){
     // para verificar se está certo
     escreveNoArquivo(saida, regs);
 
-    Buffer bufferBin("SAIDA.dat");
+    Buffer bufferBin("SAIDA.bin");
 
     for(int i=0; i<regs.size(); i++)
         bufferBin.escreverRegistroFixo(regs[i]);
