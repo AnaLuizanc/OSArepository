@@ -1,10 +1,12 @@
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
-#include "Registro.hpp"
+#include "Livro.hpp"
+#include "Indice.hpp"
 
 #include <vector>
 #include <fstream>
+#include <utility>
 
 class Buffer {
     public:
@@ -14,11 +16,12 @@ class Buffer {
 
         Buffer(const string& nomeArquivo);
 
-        void escreverRegistroFixo(const Registro& reg);
-        Registro lerRegistroFixo();
-        vector<Registro> lerRegistrosTxt();
-        bool temRegistros();
+        void escreverRegistro(const Livro& reg);
+        Livro lerRegistro();
+        pair<vector<Livro>, vector<Indice>> lerRegistrosCSV();
+        void escreverIndice(const Indice& indice);
+        vector<Indice> lerIndices();
+        Livro lerRegistroPorEndereco(long endereco);
 };
-
 
 #endif
