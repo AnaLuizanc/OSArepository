@@ -223,6 +223,31 @@ void escreveNoArquivo(ofstream& saida, vector<Livro> liv){
     }
 }
 
+void imprimeLivro(Livro liv){
+    cout << liv.id << " - ";
+    cout << liv.titulo << " - ";
+    vector<string> autores = liv.autores;
+    
+    cout << "{";
+    for(int j=0; j<autores.size(); j++){
+        cout << autores[j];
+        if(j + 1 < autores.size())
+            cout << ",";
+    }
+    cout << "} - ";
+    
+    cout << liv.ano << " - ";
+    vector<string> categorias = liv.categorias;
+    
+    cout << "{";
+    for(int j=0; j<categorias.size(); j++){
+        cout << categorias[j];
+        if(j+1 < categorias.size())
+            cout << ",";
+    }
+    cout << "}\n";
+}
+
 //------------------------------------------------------//
 
 int main(){
@@ -246,8 +271,8 @@ int main(){
 
     vector<Livro> livrosLidos = bufferBin.lerRegistroFixo();
 
-    cout << "há " << livrosLidos.size() << " livros lidos." << endl;
-    imprimeLivros(livrosLidos);
+    // cout << "há " << livrosLidos.size() << " livros lidos." << endl;
+    // imprimeLivros(livrosLidos);
 
     saida.close();
 
