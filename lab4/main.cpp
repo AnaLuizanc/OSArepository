@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <cstring>
 #include <algorithm>
 
 using namespace std;
@@ -14,6 +15,33 @@ class Livro {
         int ano;
         vector<string> categorias;
 
+        string packFixed() const{
+            string data = "|" + to_string(id) + "|" + titulo + "|";
+            for(int i=0; i<autores.size(); i++){
+                data += autores[i];
+                if(i+1 < autores.size())
+                    data += ",";
+            }
+            data += "|" + to_string(ano) + "|";
+            for(int i=0; i<categorias.size(); i++){
+                data += categorias[i];
+                if(i+1 < categorias.size())
+                    data += ",";
+            }
+
+            ofstream saidaTxt;
+            saidaTxt.open("saidapack.dat", ios_base::app);
+
+            saidaTxt << data.size() << data << endl;
+            
+            string buffer(data.size() + sizeof(short int), '\0');
+            strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(short int));
+            strncpy(&buffer[sizeof(short int)], data.c_str(), data.size());
+
+            saidaTxt.close();
+
+            return buffer;
+        }
 };
 
 class Buffer {
@@ -74,7 +102,18 @@ class Buffer {
 
             return livros;
         }
-       
+        
+        void escreverRegistroFixo(const Livro& liv){
+            ofstream saidaBinario(fileName, ios::binary | ios::app);
+
+            buffer = liv.packFixed();
+            short int tamanho = buffer.size();
+
+            saidaBinario.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            saidaBinario.write(buffer.c_str(), tamanho);
+
+            saidaBinario.close();
+        }
 
         // vector<Registro> lerRegistroFixo();
 };
@@ -147,6 +186,11 @@ int main(){
     // para verificar se está certo
     imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
+
+    Buffer bufferBin("SAIDA.bin");
+
+    for(unsigned i=0; i<livros.size(); i++)
+        bufferBin.escreverRegistroFixo(livros[i]);
 
     saida.close();
 
