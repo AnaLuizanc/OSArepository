@@ -42,6 +42,37 @@ class Livro {
 
             return buffer;
         }
+
+        void unpackFixed(const string& buffer){
+            int bufferSize = buffer.size();
+            int delimiter = buffer.find('|', 0);
+            string bufferAux = buffer.substr(delimiter+1, bufferSize);
+
+            delimiter = bufferAux.find('|', 0);
+            id = stoi(bufferAux.substr(0, delimiter));
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            titulo = bufferAux.substr(0, delimiter);
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            stringstream ssAutores(bufferAux.substr(0, delimiter));
+            string autor;
+            while(getline(ssAutores, autor, ','))
+                autores.push_back(autor);
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            ano = stoi(bufferAux.substr(0, delimiter));
+            bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
+
+            delimiter = bufferAux.find('|', 0);
+            stringstream ssCategorias(bufferAux.substr(0, delimiter));
+            string categoria;
+            while(getline(ssCategorias, categoria, ','))
+                categorias.push_back(categoria);
+        }
 };
 
 class Buffer {
@@ -115,7 +146,28 @@ class Buffer {
             saidaBinario.close();
         }
 
-        // vector<Registro> lerRegistroFixo();
+        vector<Livro> lerRegistroFixo(){
+            vector<Livro> livros;
+            ifstream arquivoBin(fileName, ios_base::binary | ios_base::in);
+            while(arquivoBin.peek() != EOF){
+                short int tamanhoReg;
+
+                arquivoBin.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+                if(arquivoBin.eof()) break;
+
+                string buffer(tamanhoReg, '\0');
+
+                if(arquivoBin.eof()) break;
+                arquivoBin.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+
+                Livro livro;
+                livro.unpackFixed(buffer);
+                livros.push_back(livro);
+            }
+            arquivoBin.close();
+
+            return livros;
+        }
 };
 
 //------------ESPAÇO PARA FUNÇÕES AUXILIARES------------//
@@ -184,13 +236,18 @@ int main(){
     livros = bufferTxt.lerLivrosCsv();
 
     // para verificar se está certo
-    imprimeLivros(livros);
+    //imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
 
     Buffer bufferBin("SAIDA.bin");
 
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
+
+    vector<Livro> livrosLidos = bufferBin.lerRegistroFixo();
+
+    cout << "há " << livrosLidos.size() << " livros lidos." << endl;
+    imprimeLivros(livrosLidos);
 
     saida.close();
 
