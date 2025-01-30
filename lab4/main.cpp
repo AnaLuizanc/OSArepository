@@ -58,8 +58,12 @@ class Buffer {
                     stringstream ssCategorias(categorias);
                     string categoria;
                     
-                    while(getline(ssCategorias, categoria, ','))
+                    while(getline(ssCategorias, categoria, ',')){
+                        categoria.erase(remove_if(categoria.begin(), categoria.begin()+1, ::isspace), categoria.begin()+1);
+                        categoria.erase(remove_if(categoria.end()-1, categoria.end(), ::isspace), categoria.end());
+                        cout << endl << categoria.size() << "-" << categoria << endl;
                         livro.categorias.push_back(categoria);
+                    }
                     
                     livros.push_back(livro);
 
@@ -143,6 +147,7 @@ int main(){
     escreveNoArquivo(saida, livros);
 
     cout << livros[0].categorias.size() << endl;
+    cout << livros[2].categorias.size() << endl;
 
     saida.close();
 
