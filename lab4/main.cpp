@@ -61,19 +61,21 @@ class Buffer {
                     while(getline(ssCategorias, categoria, ',')){
                         categoria.erase(remove_if(categoria.begin(), categoria.begin()+1, ::isspace), categoria.begin()+1);
                         categoria.erase(remove_if(categoria.end()-1, categoria.end(), ::isspace), categoria.end());
-                        cout << endl << categoria.size() << "-" << categoria << endl;
-                        livro.categorias.push_back(categoria);
+                        if(categoria.size() == 0)
+                            livro.categorias.push_back("Nenhum");
+                        else
+                            livro.categorias.push_back(categoria);
                     }
                     
                     livros.push_back(livro);
-
                 }
             }
             inFile.close();
 
             return livros;
         }
-        // void escreverRegistroFixo(const Registro& reg);
+       
+
         // vector<Registro> lerRegistroFixo();
 };
 
@@ -145,9 +147,6 @@ int main(){
     // para verificar se está certo
     imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
-
-    cout << livros[0].categorias.size() << endl;
-    cout << livros[2].categorias.size() << endl;
 
     saida.close();
 
