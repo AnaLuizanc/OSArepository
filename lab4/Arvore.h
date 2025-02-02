@@ -69,8 +69,6 @@ class ArvoreBinaria
         string Travessia_Profundidade();
         string Travessia_Largura();
 
-        TIPO* Buscar(const TIPO& item) const;
-        Nodo<TIPO>* buscarRecursivo(Nodo<TIPO>* nodo, const TIPO& item) const;
 
 };
 
@@ -91,7 +89,7 @@ void ArvoreBinaria<TIPO>::Print(Nodo<TIPO> *n)
     if ( n!= NULL )
     {
         Print(n->esq);
-        cout<<n->item<<" " << endl;
+        cout<<n->item<<" ";
         Print(n->dir);
     }
 }
@@ -139,26 +137,6 @@ bool ArvoreBinaria<TIPO>::Pesquisar(TIPO valor, Nodo<TIPO>* n)
 }
 
 template <class TIPO>
-TIPO* ArvoreBinaria<TIPO>::Buscar(const TIPO& item) const {
-    Nodo<TIPO>* nodo = buscarRecursivo(raiz, item);
-    if (nodo != nullptr) {
-        return &nodo->item;
-    }
-    return nullptr;
-}
-
-template <class TIPO>
-Nodo<TIPO>* ArvoreBinaria<TIPO>::buscarRecursivo(Nodo<TIPO>* nodo, const TIPO& item) const {
-    if (nodo == nullptr || nodo->item == item) {
-        return nodo;
-    } else if (item < nodo->item) {
-        return buscarRecursivo(nodo->esq, item);
-    } else {
-        return buscarRecursivo(nodo->dir, item);
-    }
-}
-
-template <class TIPO>
 void ArvoreBinaria<TIPO>::Remover(TIPO valor)
 {
     raiz = Remover(valor, raiz);
@@ -171,7 +149,7 @@ Nodo<TIPO>* ArvoreBinaria<TIPO>::Remover(TIPO valor, Nodo<TIPO>* n)
     {
         if ( valor == n->item )
         {
-            tmp = n; /// guardar o endereï¿½o do nï¿½ a ser removido
+            tmp = n; /// guardar o endereço do nó a ser removido
             n = RemoverNodo(n);
         }
         else if ( valor > n->item )
@@ -186,15 +164,15 @@ Nodo<TIPO>* ArvoreBinaria<TIPO>::Remover(TIPO valor, Nodo<TIPO>* n)
 template <class TIPO>
 Nodo<TIPO>* ArvoreBinaria<TIPO>::RemoverNodo(Nodo<TIPO>* n)
 {
-    if ( n->esq == NULL ) /// verifica se o no em questï¿½o nï¿½o possui sub-ï¿½rvore esquerda
+    if ( n->esq == NULL ) /// verifica se o no em questão não possui sub-árvore esquerda
         return n->dir;
-    else if ( n->dir == NULL ) /// verifica se o no em questï¿½o nï¿½o possui sub-ï¿½rvore direita
+    else if ( n->dir == NULL ) /// verifica se o no em questão não possui sub-árvore direita
         return n->esq;
     else
         return RemoverMax(n);
 }
 
-/// remoï¿½ï¿½o feita promovendo o MAIOR nï¿½ da subï¿½rvore ESQUERDA
+/// remoção feita promovendo o MAIOR nó da subárvore ESQUERDA
 template <class TIPO>
 Nodo<TIPO>* ArvoreBinaria<TIPO>::RemoverMax(Nodo<TIPO>* n)
 {
@@ -323,30 +301,30 @@ void ArvoreBinaria<TIPO>::Destruir(Nodo<TIPO>* n)
     }
 }
 
-/** impressï¿½o IN ORDER sem recursï¿½o
+/** impressão IN ORDER sem recursão
 template<class T>
 void BST<T>::iterativeInorder() {
-    Stack<BSTNode<T>*> travStack;
-    BSTNode<T> *p = root;
-    while (p != 0) {
-        while (p != 0) {      // empilhar filho da direita (se houver)
-        if (p->right)       // e o prï¿½prio nï¿½ quando for
-            travStack.push(p->right); // para a direita;
-        travStack.push(p);
-        p = p->left;
-        }
-        p = travStack.pop();        // pop em nï¿½ sem filho esquerdo
-        while (!travStack.empty() && p->right == 0) {
-                                    // visita-lo e a todos os nï¿½s
-            visit(p);               // sem filho direito;
-            p = travStack.pop();
-        }
-        visit(p);                 // visitar tambï¿½m o primeiro nï¿½ com
-        if (!travStack.empty())   // um filho direito (se houver);
-                p = travStack.pop();
-            else p = 0;
-        }
+  Stack<BSTNode<T>*> travStack;
+  BSTNode<T> *p = root;
+  while (p != 0) {
+     while (p != 0) {      // empilhar filho da direita (se houver)
+       if (p->right)       // e o próprio nó quando for
+           travStack.push(p->right); // para a direita;
+       travStack.push(p);
+       p = p->left;
+      }
+     p = travStack.pop();        // pop em nó sem filho esquerdo
+     while (!travStack.empty() && p->right == 0) {
+                                 // visita-lo e a todos os nós
+         visit(p);               // sem filho direito;
+         p = travStack.pop();
+       }
+       visit(p);                 // visitar também o primeiro nó com
+       if (!travStack.empty())   // um filho direito (se houver);
+             p = travStack.pop();
+        else p = 0;
     }
+}
 */
 
 
