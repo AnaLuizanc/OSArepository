@@ -183,7 +183,6 @@ class Buffer {
         }
 
         void escreverRegistroFixo(const Livro& liv){
-            Livro valor;
             long tam;
             ifstream arqbin;
             arqbin.open(fileName, ios_base::in | ios_base::binary);
@@ -213,7 +212,33 @@ class Buffer {
             buffer.clear();
             saidaBinario.close();
 
- 
+            // SERIALIZAÇÃO DO ARQUIVO DE INDICES
+            Indice indice(id, nr_regs);
+            arvore.Inserir(indice);
+
+            ifstream arqBinIndice;
+            arqBinIndice.open("INDICES.bin", ios_base::in | ios_base::binary);
+            arqBinIndice.seekg(0, ios_base::end);
+            tam = arqBinIndice.tellg();
+
+            arqBinIndice.seekg(0, ios_base::beg);
+            while (arqBinIndice.peek() != EOF) {
+                short int tam;
+                arqBinIndice.read(reinterpret_cast<char*>(&tam), sizeof(tam));
+                if (arqBinIndice.eof()) break;
+                arqBinIndice.seekg(tam, ios_base::cur);
+            }
+            arqBinIndice.close();
+
+            ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
+
+            buffer = indice.packFixed();
+            tamanho = buffer.size();
+
+            saidaBinIndice.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            saidaBinIndice.write(buffer.c_str(), tamanho);
+
+            saidaBinIndice.close();
         }
 
         vector<Livro> lerRegistroFixo(){
@@ -360,9 +385,7 @@ int main(){
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    ArvoreBinaria<Indice> arv = bufferBin.arvore;
-
-    // arv.Print();
+    bufferBin.arvore.Print();
 
     // cout << "b" << endl;
 
