@@ -120,6 +120,14 @@ class Indice {
             return buffer;
         }
 
+        void unpackFixed(const string& buffer){
+            int bufferSize = buffer.size();
+            int delimiter = buffer.find('|', 0);
+            
+            id = stoi(buffer.substr(0, delimiter));
+            endereco = stoi(buffer.substr(delimiter+1, buffer.size()-1));
+        }
+
     };
 
 class Buffer {
@@ -241,7 +249,7 @@ class Buffer {
             saidaBinIndice.close();
         }
 
-        vector<Livro> lerRegistroFixo(){
+        pair<vector<Livro>,vector<Indice>> lerRegistroFixo(){
             vector<Livro> livros;
             ifstream arquivoBin(fileName, ios_base::binary | ios_base::in);
             while(arquivoBin.peek() != EOF){
@@ -261,7 +269,27 @@ class Buffer {
             }
             arquivoBin.close();
 
-            return livros;
+            // DESSERIALIZAÇÃO DO ARQUIVO DE ÍNDICES
+            vector<Indice> indices;
+            ifstream arquivoBinIndice("INDICES.bin", ios_base::binary | ios_base::in);
+            while(arquivoBinIndice.peek() != EOF){
+                short int tamanhoReg;
+
+                arquivoBinIndice.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+                if(arquivoBinIndice.eof()) break;
+
+                string buffer(tamanhoReg, '\0');
+
+                if(arquivoBinIndice.eof()) break;
+                arquivoBinIndice.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+
+                Indice indice;
+                indice.unpackFixed(buffer);
+                indices.push_back(indice);
+            }
+            arquivoBinIndice.close();
+
+            return make_pair(livros, indices);
         }
 };
 
@@ -385,11 +413,11 @@ int main(){
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    bufferBin.arvore.Print();
+    //bufferBin.arvore.Print();
 
-    // cout << "b" << endl;
-
-    //vector<Livro> livrosLidos = bufferBin.lerRegistroFixo();
+    pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
+    livros = retornoDesserializa.first;
+    vector<Indice> indices = retornoDesserializa.second;
 
     // cout << "há " << livrosLidos.size() << " livros lidos." << endl;
     // imprimeLivros(livrosLidos);
