@@ -36,7 +36,7 @@ class Livro {
             saidaTxt.open("saidapack.dat", ios_base::app);
 
             saidaTxt << data.size() << data << endl;
-            
+
             string buffer(data.size() + sizeof(short int), '\0');
             strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(short int));
             strncpy(&buffer[sizeof(short int)], data.c_str(), data.size());
@@ -83,21 +83,50 @@ class Indice {
         int id;
         int endereco;
 
-        Indice(int id, int endereco){
-            this->id = id;
-            this->endereco = endereco;
-            
+        Indice() : id(0), endereco(0) {}
+
+        Indice(int id, int endereco) : id(id), endereco(endereco) {}
+
+        bool operator<(const Indice& other) const {
+            return id < other.id;
         }
 
-        // void insereIndice(){
-        //     ArvoreBinaria::Inserir
-        // }
-};
+        bool operator>(const Indice& other) const {
+            return id > other.id;
+        }
+
+        bool operator==(const Indice& other) const {
+            return id == other.id;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const Indice& indice) {
+            os << indice.id << " - " << indice.endereco << endl;
+            return os;
+        }
+
+        string packFixed() const{
+            string data = to_string(id) + "|" + to_string(endereco);
+
+            ofstream saidaTxt;
+            saidaTxt.open("indices.dat", ios_base::app);
+
+            saidaTxt << data << endl;
+
+            string buffer(data.size(), '\0');
+            strncpy(&buffer[0], data.c_str(), data.size());
+
+            saidaTxt.close();
+
+            return buffer;
+        }
+
+    };
 
 class Buffer {
     public:
         string fileName;
         string buffer;
+        ArvoreBinaria<Indice> arvore;
 
         Buffer(const string& fileName){
             this->fileName = fileName;
@@ -121,21 +150,21 @@ class Buffer {
                     getline(ss, autores, ';');
                     getline(ss, ano, ';');
                     getline(ss, categorias, '\n');
-                    
+
                     Livro livro;
                     livro.id = stoi(id);
                     livro.titulo = titulo;
-                    
+
                     stringstream ssAutores(autores);
                     string autor;
                     while(getline(ssAutores, autor, ','))
                         livro.autores.push_back(autor);
 
                     livro.ano = stoi(ano);
-                    
+
                     stringstream ssCategorias(categorias);
                     string categoria;
-                    
+
                     while(getline(ssCategorias, categoria, ',')){
                         categoria.erase(remove_if(categoria.begin(), categoria.begin()+1, ::isspace), categoria.begin()+1);
                         categoria.erase(remove_if(categoria.end()-1, categoria.end(), ::isspace), categoria.end());
@@ -144,7 +173,7 @@ class Buffer {
                         else
                             livro.categorias.push_back(categoria);
                     }
-                    
+
                     livros.push_back(livro);
                 }
             }
@@ -152,7 +181,7 @@ class Buffer {
 
             return livros;
         }
-        
+
         void escreverRegistroFixo(const Livro& liv){
             Livro valor;
             long tam;
@@ -160,7 +189,7 @@ class Buffer {
             arqbin.open(fileName, ios_base::in | ios_base::binary);
             arqbin.seekg(0, ios_base::end);
             tam = arqbin.tellg();
-            
+
             arqbin.seekg(0, ios_base::beg);
             int nr_regs = 0;
             while (arqbin.peek() != EOF) {
@@ -169,8 +198,8 @@ class Buffer {
                 if (arqbin.eof()) break;
                 arqbin.seekg(tam, ios_base::cur);
                 nr_regs++;
-            }            
-            
+            }
+
             ofstream saidaBinario(fileName, ios::binary | ios::app);
 
             pair<string,int> retorno = liv.packFixed();
@@ -181,10 +210,10 @@ class Buffer {
             saidaBinario.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
             saidaBinario.write(buffer.c_str(), tamanho);
 
-            Indice indice(id, nr_regs);
-            // indice.insereIndice();
-
+            buffer.clear();
             saidaBinario.close();
+
+ 
         }
 
         vector<Livro> lerRegistroFixo(){
@@ -218,7 +247,7 @@ void imprimeLivros(vector<Livro> liv){
         cout << liv[i].id << " - ";
         cout << liv[i].titulo << " - ";
         vector<string> autores = liv[i].autores;
-        
+
         cout << "{";
         for(int j=0; j<autores.size(); j++){
             cout << autores[j];
@@ -226,10 +255,10 @@ void imprimeLivros(vector<Livro> liv){
                 cout << ",";
         }
         cout << "} - ";
-        
+
         cout << liv[i].ano << " - ";
         vector<string> categorias = liv[i].categorias;
-        
+
         cout << "{";
         for(int j=0; j<categorias.size(); j++){
             cout << categorias[j];
@@ -268,7 +297,7 @@ void imprimeLivro(Livro liv){
     cout << liv.id << " - ";
     cout << liv.titulo << " - ";
     vector<string> autores = liv.autores;
-    
+
     cout << "{";
     for(int j=0; j<autores.size(); j++){
         cout << autores[j];
@@ -276,10 +305,10 @@ void imprimeLivro(Livro liv){
             cout << ",";
     }
     cout << "} - ";
-    
+
     cout << liv.ano << " - ";
     vector<string> categorias = liv.categorias;
-    
+
     cout << "{";
     for(int j=0; j<categorias.size(); j++){
         cout << categorias[j];
@@ -287,6 +316,27 @@ void imprimeLivro(Livro liv){
             cout << ",";
     }
     cout << "}\n";
+}
+
+void testeInsereArvore(){
+    vector<int> v = {27, 17, 12, 54, 21, 34, 65, 1};
+    ArvoreBinaria<int> arvore;
+    for(int i=0; i<v.size(); i++){
+        arvore.Inserir(v[i]);
+    }
+
+    vector<Indice> v2;
+    for(int i=0; i<v.size(); i++)
+        v2.push_back(Indice(v[i], i));
+
+    for(int i=0; i<v2.size(); i++)
+        cout << v2[i].id << " - " << v2[i].endereco << endl;
+
+    ArvoreBinaria<Indice> arvore2;
+    for(int i=0; i<v2.size(); i++)
+        arvore2.Inserir(v2[i]);
+
+    arvore2.Print();
 }
 
 //------------------------------------------------------//
@@ -310,10 +360,18 @@ int main(){
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    vector<Livro> livrosLidos = bufferBin.lerRegistroFixo();
+    ArvoreBinaria<Indice> arv = bufferBin.arvore;
+
+    // arv.Print();
+
+    // cout << "b" << endl;
+
+    //vector<Livro> livrosLidos = bufferBin.lerRegistroFixo();
 
     // cout << "há " << livrosLidos.size() << " livros lidos." << endl;
     // imprimeLivros(livrosLidos);
+
+    //testeInsereArvore();
 
     saida.close();
 
