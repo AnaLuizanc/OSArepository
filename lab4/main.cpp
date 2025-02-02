@@ -4,6 +4,9 @@
 #include <fstream>
 #include <cstring>
 #include <algorithm>
+#include <utility>
+
+#include "Arvore.h"
 
 using namespace std;
 
@@ -15,7 +18,7 @@ class Livro {
         int ano;
         vector<string> categorias;
 
-        string packFixed() const{
+        pair<string,int> packFixed() const{
             string data = "|" + to_string(id) + "|" + titulo + "|";
             for(int i=0; i<autores.size(); i++){
                 data += autores[i];
@@ -40,7 +43,7 @@ class Livro {
 
             saidaTxt.close();
 
-            return buffer;
+            return make_pair(buffer,id);
         }
 
         void unpackFixed(const string& buffer){
@@ -73,6 +76,22 @@ class Livro {
             while(getline(ssCategorias, categoria, ','))
                 categorias.push_back(categoria);
         }
+};
+
+class Indice {
+    public:
+        int id;
+        int endereco;
+
+        Indice(int id, int endereco){
+            this->id = id;
+            this->endereco = endereco;
+            
+        }
+
+        // void insereIndice(){
+        //     ArvoreBinaria::Inserir
+        // }
 };
 
 class Buffer {
@@ -135,13 +154,35 @@ class Buffer {
         }
         
         void escreverRegistroFixo(const Livro& liv){
+            Livro valor;
+            long tam;
+            ifstream arqbin;
+            arqbin.open(fileName, ios_base::in | ios_base::binary);
+            arqbin.seekg(0, ios_base::end);
+            tam = arqbin.tellg();
+            
+            arqbin.seekg(0, ios_base::beg);
+            int nr_regs = 0;
+            while (arqbin.peek() != EOF) {
+                short int tam;
+                arqbin.read(reinterpret_cast<char*>(&tam), sizeof(tam));
+                if (arqbin.eof()) break;
+                arqbin.seekg(tam, ios_base::cur);
+                nr_regs++;
+            }            
+            
             ofstream saidaBinario(fileName, ios::binary | ios::app);
 
-            buffer = liv.packFixed();
+            pair<string,int> retorno = liv.packFixed();
+            buffer = retorno.first;
+            int id = retorno.second;
             short int tamanho = buffer.size();
 
             saidaBinario.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
             saidaBinario.write(buffer.c_str(), tamanho);
+
+            Indice indice(id, nr_regs);
+            // indice.insereIndice();
 
             saidaBinario.close();
         }
