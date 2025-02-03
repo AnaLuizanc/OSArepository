@@ -453,7 +453,7 @@ Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
 
 void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
     int opcao;
-    cout << "1. Titulo do livro" << endl;
+    cout << endl << "1. Titulo do livro" << endl;
     cout << "2. Autor(es) do livro" << endl;
     cout << "3. Data de publicacao do livro" << endl;
     cout << "4. Categoria(s) do livro" << endl;
@@ -497,6 +497,7 @@ int main(){
 
     vector<Livro> livros; // lidos do arquivo txt
 
+    // LEITURA DOS LIVROS DO ARQUIVO CSV
     Buffer bufferTxt("teste.csv");
     livros = bufferTxt.lerLivrosCsv();
 
@@ -506,17 +507,28 @@ int main(){
 
     Buffer bufferBin("SAIDA.bin");
 
+    // SERIALIZAÇÃO
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    //bufferBin.arvore.Print();
-
+    // DESSERIALIAÇÃO
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     vector<Indice> indices = retornoDesserializa.second;
 
-    int id = 74241;
-    efetuarBuscas(bufferBin.arvore, id);
+    // NOVAS INSERÇÕES DE LIVROS
+    bufferTxt.fileName = "novosLivros.csv";
+    livros = bufferTxt.lerLivrosCsv();
+
+    escreveNoArquivo(saida, livros);
+
+    for(unsigned i=0; i<livros.size(); i++)
+        bufferBin.escreverRegistroFixo(livros[i]);
+
+    retornoDesserializa = bufferBin.lerRegistroFixo();
+
+    // PARA PESQUISAR LIVRO POR ID
+    efetuarBuscas(bufferBin.arvore, 912840);
 
     saida.close();
 
