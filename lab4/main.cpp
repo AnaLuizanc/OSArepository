@@ -448,6 +448,44 @@ Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
 
         return livro;
     }
+    return Livro();
+}
+
+void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
+    int opcao;
+    cout << "1. Titulo do livro" << endl;
+    cout << "2. Autor(es) do livro" << endl;
+    cout << "3. Data de publicacao do livro" << endl;
+    cout << "4. Categoria(s) do livro" << endl;
+    cout << "Deseja buscar por qual opcao? ";
+    cin >> opcao;
+    Livro livro = pesquisaLivro(arvore, id);
+    switch (opcao){
+    case 1:
+        cout << livro.titulo << endl;
+        break;
+    case 2:
+        for(unsigned i=0; i<livro.autores.size(); i++){
+            cout << livro.autores[i];
+            if(i + 1 < livro.autores.size())
+                cout << ","; 
+        }
+        cout << endl;
+        break;
+    case 3:
+        cout << livro.ano << endl;
+        break;
+    case 4:
+        for(unsigned i=0; i<livro.categorias.size(); i++){
+            cout << livro.categorias[i];
+            if(i + 1 < livro.categorias.size())
+                cout << ","; 
+        }
+        cout << endl;
+    default:
+        break;
+    }
+
 }
 
 //------------------------------------------------------//
@@ -478,7 +516,7 @@ int main(){
     vector<Indice> indices = retornoDesserializa.second;
 
     int id = 74241;
-    pesquisaLivro(bufferBin.arvore, id);
+    efetuarBuscas(bufferBin.arvore, id);
 
     saida.close();
 
