@@ -85,6 +85,8 @@ class Indice {
 
         Indice() : id(0), endereco(0) {}
 
+        Indice(int id) : id(id) {}
+
         Indice(int id, int endereco) : id(id), endereco(endereco) {}
 
         bool operator<(const Indice& other) const {
@@ -392,6 +394,20 @@ void testeInsereArvore(){
     arvore2.Print();
 }
 
+void imprimeIndice(vector<Indice> indices){
+    cout << "ID    | Endereco " << endl;
+    for(int i=0; i<indices.size(); i++)
+        cout << indices[i].id << "     " << indices[i].endereco << endl;
+}
+
+void pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id) {
+    Indice* resultado = arvore.BuscarObjeto(Indice(id, 0));
+    if (resultado != NULL)
+        cout << "ID: " << resultado->id << ", Endereco: " << resultado->endereco << endl;
+    else
+        cout << "ID " << id << " não encontrado." << endl;
+}
+
 //------------------------------------------------------//
 
 int main(){
@@ -413,16 +429,14 @@ int main(){
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    //bufferBin.arvore.Print();
+    bufferBin.arvore.Print();
 
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     vector<Indice> indices = retornoDesserializa.second;
 
-    // cout << "há " << livrosLidos.size() << " livros lidos." << endl;
-    // imprimeLivros(livrosLidos);
-
-    //testeInsereArvore();
+    int id = 74241;
+    pesquisaLivro(bufferBin.arvore, id);
 
     saida.close();
 
