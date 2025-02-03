@@ -223,7 +223,7 @@ class Buffer {
             saidaBinario.close();
 
             // SERIALIZAÇÃO DO ARQUIVO DE INDICES
-            Indice indice(id, nr_regs);
+            Indice indice(id, nr_regs+1);
             arvore.Inserir(indice);
 
             ifstream arqBinIndice;
@@ -400,12 +400,54 @@ void imprimeIndice(vector<Indice> indices){
         cout << indices[i].id << "     " << indices[i].endereco << endl;
 }
 
-void pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id) {
+int pesquisaIndice(ArvoreBinaria<Indice>& arvore, int id) {
     Indice* resultado = arvore.BuscarObjeto(Indice(id, 0));
     if (resultado != NULL)
-        cout << "ID: " << resultado->id << ", Endereco: " << resultado->endereco << endl;
+        return resultado->endereco;
     else
-        cout << "ID " << id << " não encontrado." << endl;
+        return -1;
+}
+
+Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
+    if(pesquisaIndice(arvore,id)){
+        int posicao = pesquisaIndice(arvore,id);
+        Livro livro;
+        long tamanho;
+        ifstream arqbin;
+        arqbin.open("SAIDA.bin", ios_base::in | ios_base::binary);
+        arqbin.seekg(0, ios_base::end);
+        tamanho = arqbin.tellg();
+        
+        arqbin.seekg(0, ios_base::beg);
+        int nr_regs = 0;
+        while (arqbin.peek() != EOF) {
+            short int tamanho;
+            arqbin.read(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            if (arqbin.eof()) break;
+            arqbin.seekg(tamanho, ios_base::cur);
+            nr_regs++;
+        }
+
+        string buffer;
+        if(posicao > 0){
+            if(posicao <= nr_regs){
+                arqbin.seekg(0, ios_base::beg);
+                for (int i = 0; i < posicao; i++) {
+                    short int tamanho;
+                    arqbin.read(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+                    buffer.resize(tamanho);
+                    arqbin.read(&buffer[0], tamanho);
+                }
+                livro.unpackFixed(buffer);
+            }
+            else
+                cout << "Posicao nao existe" << endl;
+        }
+        
+        arqbin.close();
+
+        return livro;
+    }
 }
 
 //------------------------------------------------------//
@@ -429,7 +471,7 @@ int main(){
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    bufferBin.arvore.Print();
+    //bufferBin.arvore.Print();
 
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
