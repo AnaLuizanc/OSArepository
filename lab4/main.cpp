@@ -130,7 +130,7 @@ class Indice {
             endereco = stoi(buffer.substr(delimiter+1, buffer.size()-1));
         }
 
-    };
+};
 
 class Buffer {
     public:
@@ -155,13 +155,35 @@ class Buffer {
                     }
                     stringstream ss(line);
                     string titulo, id, ano, autores, categorias;
-                    getline(ss, id, ';');
-                    getline(ss, titulo, ';');
-                    getline(ss, autores, ';');
-                    getline(ss, ano, ';');
-                    getline(ss, categorias, '\n');
-
                     Livro livro;
+                    
+                    getline(ss, id, ';');
+                    
+                    string lineAux = line.substr(id.size()+1);
+                    
+                    if(lineAux[0] == '\"'){
+                        reverse(lineAux.begin(), lineAux.end());
+                        getline(stringstream(lineAux), categorias, ';');
+                        reverse(categorias.begin(), categorias.end());
+                        
+                        lineAux = lineAux.substr(categorias.size()+1);
+                        getline(stringstream(lineAux), ano, ';');
+                        reverse(ano.begin(), ano.end());
+
+                        lineAux = lineAux.substr(ano.size()+1);
+                        getline(stringstream(lineAux), autores, ';');
+                        reverse(autores.begin(), autores.end());
+
+                        lineAux = lineAux.substr(autores.size()+1);
+                        reverse(lineAux.begin(), lineAux.end());
+                        titulo = lineAux;
+                    }else {
+                        getline(ss, titulo, ';');
+                        getline(ss, autores, ';');
+                        getline(ss, ano, ';');
+                        getline(ss, categorias, '\n');
+                    }
+
                     livro.id = stoi(id);
                     livro.titulo = titulo;
 
@@ -373,27 +395,6 @@ void imprimeLivro(Livro liv){
     cout << "}\n";
 }
 
-void testeInsereArvore(){
-    vector<int> v = {27, 17, 12, 54, 21, 34, 65, 1};
-    ArvoreBinaria<int> arvore;
-    for(int i=0; i<v.size(); i++){
-        arvore.Inserir(v[i]);
-    }
-
-    vector<Indice> v2;
-    for(int i=0; i<v.size(); i++)
-        v2.push_back(Indice(v[i], i));
-
-    for(int i=0; i<v2.size(); i++)
-        cout << v2[i].id << " - " << v2[i].endereco << endl;
-
-    ArvoreBinaria<Indice> arvore2;
-    for(int i=0; i<v2.size(); i++)
-        arvore2.Inserir(v2[i]);
-
-    arvore2.Print();
-}
-
 void imprimeIndice(vector<Indice> indices){
     cout << "ID    | Endereco " << endl;
     for(int i=0; i<indices.size(); i++)
@@ -495,28 +496,28 @@ int main(){
     ofstream saida;
     saida.open("SAIDA.dat", ios_base::out); //abre para escrita
 
-    vector<Livro> livros; // lidos do arquivo txt
+    vector<Livro> livros; //lidos do arquivo txt
 
-    // LEITURA DOS LIVROS DO ARQUIVO CSV
-    Buffer bufferTxt("teste.csv");
+    //LEITURA DOS LIVROS DO ARQUIVO CSV
+    Buffer bufferTxt("booksDataset.csv");
     livros = bufferTxt.lerLivrosCsv();
 
-    // para verificar se está certo
+    //para verificar se está certo
     //imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
 
     Buffer bufferBin("SAIDA.bin");
 
-    // SERIALIZAÇÃO
+    //SERIALIZAÇÃO
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i]);
 
-    // DESSERIALIAÇÃO
+    //DESSERIALIAÇÃO
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     vector<Indice> indices = retornoDesserializa.second;
 
-    // NOVAS INSERÇÕES DE LIVROS
+    //NOVAS INSERÇÕES DE LIVROS
     bufferTxt.fileName = "novosLivros.csv";
     livros = bufferTxt.lerLivrosCsv();
 
@@ -527,7 +528,7 @@ int main(){
 
     retornoDesserializa = bufferBin.lerRegistroFixo();
 
-    // PARA PESQUISAR LIVRO POR ID
+    //PARA PESQUISAR LIVRO POR ID
     efetuarBuscas(bufferBin.arvore, 912840);
 
     saida.close();
