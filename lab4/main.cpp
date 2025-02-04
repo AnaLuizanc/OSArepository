@@ -159,24 +159,30 @@ class Buffer {
                     
                     getline(ss, id, ';');
                     
-                    string lineAux = line.substr(id.size()+1);
-                    
-                    if(lineAux[0] == '\"'){
-                        reverse(lineAux.begin(), lineAux.end());
-                        getline(stringstream(lineAux), categorias, ';');
-                        reverse(categorias.begin(), categorias.end());
-                        
-                        lineAux = lineAux.substr(categorias.size()+1);
-                        getline(stringstream(lineAux), ano, ';');
-                        reverse(ano.begin(), ano.end());
-
-                        lineAux = lineAux.substr(ano.size()+1);
-                        getline(stringstream(lineAux), autores, ';');
-                        reverse(autores.begin(), autores.end());
-
-                        lineAux = lineAux.substr(autores.size()+1);
-                        reverse(lineAux.begin(), lineAux.end());
-                        titulo = lineAux;
+                    if(line[id.size()+1] == '\"'){
+                        string lineAux = line.substr(id.size()+1);
+                        int contadorAspas = 0;
+                        int index = 0;
+                        for(char c : lineAux){
+                            if(c == '\"'){
+                                contadorAspas++;
+                                index++;
+                            }
+                            else if(c == ';'){
+                                if(contadorAspas%2 == 0)
+                                    break;
+                                else
+                                    index++;
+                            }
+                            else
+                                index++;
+                        }
+                        line = lineAux.substr(index+1);
+                        titulo = lineAux.substr(0, index);
+                        stringstream ssAux(line);
+                        getline(ssAux, autores, ';');
+                        getline(ssAux, ano, ';');
+                        getline(ssAux, categorias, '\n');
                     }else {
                         getline(ss, titulo, ';');
                         getline(ss, autores, ';');
@@ -499,7 +505,7 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    Buffer bufferTxt("booksDataset.csv");
+    Buffer bufferTxt("teste.csv");
     livros = bufferTxt.lerLivrosCsv();
 
     //para verificar se está certo
@@ -516,20 +522,22 @@ int main(){
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     vector<Indice> indices = retornoDesserializa.second;
+    imprimeLivros(livros);
+
 
     //NOVAS INSERÇÕES DE LIVROS
-    bufferTxt.fileName = "novosLivros.csv";
-    livros = bufferTxt.lerLivrosCsv();
+    // bufferTxt.fileName = "novosLivros.csv";
+    // livros = bufferTxt.lerLivrosCsv();
 
-    escreveNoArquivo(saida, livros);
+    // escreveNoArquivo(saida, livros);
 
-    for(unsigned i=0; i<livros.size(); i++)
-        bufferBin.escreverRegistroFixo(livros[i]);
+    // for(unsigned i=0; i<livros.size(); i++)
+    //     bufferBin.escreverRegistroFixo(livros[i]);
 
-    retornoDesserializa = bufferBin.lerRegistroFixo();
+    // retornoDesserializa = bufferBin.lerRegistroFixo();
 
     //PARA PESQUISAR LIVRO POR ID
-    efetuarBuscas(bufferBin.arvore, 912840);
+    //efetuarBuscas(bufferBin.arvore, 61625);
 
     saida.close();
 
