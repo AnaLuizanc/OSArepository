@@ -485,8 +485,8 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    //Buffer bufferTxt("booksDataset.csv");
-    Buffer bufferTxt("datasetmenor.csv");
+    //Buffer bufferTxt("./csvFiles/booksDataset.csv");
+    Buffer bufferTxt("./csvFiles/datasetmenor.csv");
     livros = bufferTxt.lerLivrosCsv();
 
     //para verificar se está certo
@@ -511,7 +511,7 @@ int main(){
 
 
     //NOVAS INSERÇÕES DE LIVROS
-    // bufferTxt.fileName = "novosLivros.csv";
+    // bufferTxt.fileName = "./csvFiles/novosLivros.csv";
     // livros = bufferTxt.lerLivrosCsv();
 
     // escreveNoArquivo(saida, livros);
