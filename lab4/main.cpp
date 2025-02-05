@@ -19,7 +19,7 @@ void imprimeLivros(vector<Livro> liv){
         vector<string> autores = liv[i].autores;
 
         cout << "{";
-        for(int j=0; j<autores.size(); j++){
+        for(unsigned j=0; j<autores.size(); j++){
             cout << autores[j];
             if(j + 1 < autores.size())
                 cout << ",";
@@ -30,7 +30,7 @@ void imprimeLivros(vector<Livro> liv){
         vector<string> categorias = liv[i].categorias;
 
         cout << "{";
-        for(int j=0; j<categorias.size(); j++){
+        for(unsigned j=0; j<categorias.size(); j++){
             cout << categorias[j];
             if(j+1 < categorias.size())
                 cout << ",";
@@ -45,7 +45,7 @@ void escreveNoArquivo(ofstream& saida, vector<Livro> liv){
         saida << liv[i].titulo << " - ";
         vector<string> autores = liv[i].autores;
         saida << "{";
-        for(int j=0; j<autores.size(); j++){
+        for(unsigned j=0; j<autores.size(); j++){
             saida << autores[j];
             if(j + 1 < autores.size())
                 saida << ",";
@@ -54,7 +54,7 @@ void escreveNoArquivo(ofstream& saida, vector<Livro> liv){
         saida << liv[i].ano << " - ";
         vector<string> categorias = liv[i].categorias;
         saida << "{";
-        for(int j=0; j<categorias.size(); j++){
+        for(unsigned j=0; j<categorias.size(); j++){
             saida << categorias[j];
             if(j+1 < categorias.size())
                 saida << ",";
@@ -69,7 +69,7 @@ void imprimeLivro(Livro liv){
     vector<string> autores = liv.autores;
 
     cout << "{";
-    for(int j=0; j<autores.size(); j++){
+    for(unsigned j=0; j<autores.size(); j++){
         cout << autores[j];
         if(j + 1 < autores.size())
             cout << ",";
@@ -80,7 +80,7 @@ void imprimeLivro(Livro liv){
     vector<string> categorias = liv.categorias;
 
     cout << "{";
-    for(int j=0; j<categorias.size(); j++){
+    for(unsigned j=0; j<categorias.size(); j++){
         cout << categorias[j];
         if(j+1 < categorias.size())
             cout << ",";
@@ -90,7 +90,7 @@ void imprimeLivro(Livro liv){
 
 void imprimeIndice(vector<Indice> indices){
     cout << "ID    | Endereco " << endl;
-    for(int i=0; i<indices.size(); i++)
+    for(unsigned i=0; i<indices.size(); i++)
         cout << indices[i].id << "     " << indices[i].endereco << endl;
 }
 
@@ -106,11 +106,9 @@ Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
     if(pesquisaIndice(arvore,id)){
         int posicao = pesquisaIndice(arvore,id);
         Livro livro;
-        long tamanho;
         ifstream arqbin;
         arqbin.open("SAIDA.bin", ios_base::in | ios_base::binary);
         arqbin.seekg(0, ios_base::end);
-        tamanho = arqbin.tellg();
         
         arqbin.seekg(0, ios_base::beg);
         int nr_regs = 0;
@@ -192,8 +190,8 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    //Buffer bufferTxt("./csvFiles/booksDataset.csv"); // arquivo original
-    Buffer bufferTxt("./csvFiles/datasetmenor.csv"); // arquivo menor
+    Buffer bufferTxt("./csvFiles/booksDataset.csv"); // arquivo original
+    //Buffer bufferTxt("./csvFiles/datasetmenor.csv"); // arquivo menor
     livros = bufferTxt.lerLivrosCsv();
 
     //PARA VERIFICAR SE ESTÁ CERTO
