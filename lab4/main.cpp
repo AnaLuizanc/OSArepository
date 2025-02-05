@@ -220,7 +220,7 @@ class Buffer {
             return livros;
         }
 
-        void escreverRegistroFixo(const Livro& liv){
+        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice){
             long tam;
             ifstream arqbin;
             arqbin.open(fileName, ios_base::in | ios_base::binary);
@@ -236,8 +236,7 @@ class Buffer {
                 arqbin.seekg(tam, ios_base::cur);
                 nr_regs++;
             }
-
-            ofstream saidaBinario(fileName, ios::binary | ios::app);
+            arqbin.close();
 
             pair<string,int> retorno = liv.packFixed();
             buffer = retorno.first;
@@ -248,35 +247,16 @@ class Buffer {
             saidaBinario.write(buffer.c_str(), tamanho);
 
             buffer.clear();
-            saidaBinario.close();
 
             // SERIALIZAÇÃO DO ARQUIVO DE INDICES
             Indice indice(id, nr_regs+1);
             arvore.Inserir(indice);
-
-            ifstream arqBinIndice;
-            arqBinIndice.open("INDICES.bin", ios_base::in | ios_base::binary);
-            arqBinIndice.seekg(0, ios_base::end);
-            tam = arqBinIndice.tellg();
-
-            arqBinIndice.seekg(0, ios_base::beg);
-            while (arqBinIndice.peek() != EOF) {
-                short int tam;
-                arqBinIndice.read(reinterpret_cast<char*>(&tam), sizeof(tam));
-                if (arqBinIndice.eof()) break;
-                arqBinIndice.seekg(tam, ios_base::cur);
-            }
-            arqBinIndice.close();
-
-            ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
 
             buffer = indice.packFixed();
             tamanho = buffer.size();
 
             saidaBinIndice.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
             saidaBinIndice.write(buffer.c_str(), tamanho);
-
-            saidaBinIndice.close();
         }
 
         pair<vector<Livro>,vector<Indice>> lerRegistroFixo(){
@@ -505,7 +485,8 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    Buffer bufferTxt("teste.csv");
+    //Buffer bufferTxt("booksDataset.csv");
+    Buffer bufferTxt("datasetmenor.csv");
     livros = bufferTxt.lerLivrosCsv();
 
     //para verificar se está certo
@@ -515,8 +496,12 @@ int main(){
     Buffer bufferBin("SAIDA.bin");
 
     //SERIALIZAÇÃO
+    ofstream saidaBinario("SAIDA.bin", ios::binary | ios::app);
+    ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
     for(unsigned i=0; i<livros.size(); i++)
-        bufferBin.escreverRegistroFixo(livros[i]);
+        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice);
+    saidaBinario.close();
+    saidaBinIndice.close();
 
     //DESSERIALIAÇÃO
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
@@ -531,8 +516,12 @@ int main(){
 
     // escreveNoArquivo(saida, livros);
 
+    // saidaBinario.open("SAIDA.bin", ios::binary | ios::app);
+    // saidaBinIndice.open("INDICES.bin", ios::binary | ios::app);
     // for(unsigned i=0; i<livros.size(); i++)
-    //     bufferBin.escreverRegistroFixo(livros[i]);
+    //     bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice);
+    // saidaBinario.close();
+    // saidaBinIndice.close();
 
     // retornoDesserializa = bufferBin.lerRegistroFixo();
 
