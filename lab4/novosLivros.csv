@@ -1,4 +1,14 @@
 ID;Title;Authors;Publish Date (Year);Category
 113715;Algoritmos: Teoria e Prática;Thomas H. Cormen, Charles E. Leiserson, Ronald L Rivest, Clifford Stein;2012; Study , Programming , Data Structures
 910401;Sistemas Operacionais Modernos;Andrew S. Tanenbaum;2010; Study , Computer Science , Operating systems
-912840;Programação de Computadores com C++: guia prático de orientação e desenvolvimento;José Augusto N. G. Manzano;2010;
+912840;Programação de Computadores com C++: guia prático de orientação e desenvolvimento;José Augusto N. G. Manzano;2010; 
+175643;Introduction to the Theory of Computation;Michael Sipser;1996; Teoria da Computação, Matemática Discreta
+182134;The Art of Computer Programming;Donald E. Knuth;1968; Algoritmos, Estruturas de Dados, Matemática da Computação
+191231;Structure and Interpretation of Computer Programs;Harold Abelson, Gerald Jay Sussman, Julie Sussman;1985; Programação, Ciência da Computação
+172342;Computer Networking: A Top-Down Approach;James F. Kurose, Keith W. Ross;2000; Redes de Computadores
+168563;Computer Organization and Design: The Hardware/Software Interface;David A. Patterson, John L. Hennessy;1993; Arquitetura de Computadores
+190067;Design Patterns: Elements of Reusable Object-Oriented Software;Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides;1994; Engenharia de Software, Programação Orientada a Objetos
+213423;Artificial Intelligence: A Modern Approach;Stuart Russell, Peter Norvig;1995; Inteligência Artificial
+200782;Operating System Concepts;Abraham Silberschatz, Peter B. Galvin, Greg Gagne;1983; Sistemas Operacionais
+199876;Clean Code: A Handbook of Agile Software Craftsmanship;Robert C. Martin;2008; Desenvolvimento de Software, Engenharia de Software
+197212;Compilers: Principles, Techniques, and Tools;Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman;1986; Compiladores, Linguagens de Programação
