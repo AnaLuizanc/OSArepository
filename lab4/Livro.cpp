@@ -2,13 +2,13 @@
 
 pair<string,int> Livro::packFixed() const{
     string data = "|" + to_string(id) + "|" + titulo + "|";
-    for(int i=0; i<autores.size(); i++){
+    for(unsigned i=0; i<autores.size(); i++){
         data += autores[i];
         if(i+1 < autores.size())
             data += ",";
     }
     data += "|" + to_string(ano) + "|";
-    for(int i=0; i<categorias.size(); i++){
+    for(unsigned i=0; i<categorias.size(); i++){
         data += categorias[i];
         if(i+1 < categorias.size())
             data += ",";

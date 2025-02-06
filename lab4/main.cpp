@@ -226,7 +226,7 @@ int main(){
     retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     indices = retornoDesserializa.second;
-    imprimeLivros(livros);
+    //imprimeLivros(livros);
 
     //PARA PESQUISAR LIVRO POR ID
     efetuarBuscas(bufferBin.arvore, 61625);

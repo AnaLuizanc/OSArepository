@@ -17,7 +17,6 @@ string Indice::packFixed() const{
 }
 
 void Indice::unpackFixed(const string& buffer){
-    int bufferSize = buffer.size();
     int delimiter = buffer.find('|', 0);
     
     id = stoi(buffer.substr(0, delimiter));
