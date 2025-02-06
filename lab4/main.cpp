@@ -149,6 +149,7 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
     cout << "2. Autor(es) do livro" << endl;
     cout << "3. Data de publicacao do livro" << endl;
     cout << "4. Categoria(s) do livro" << endl;
+    cout << "5. Tudo" << endl;
     cout << "Deseja buscar por qual opcao? ";
     cin >> opcao;
     Livro livro = pesquisaLivro(arvore, id);
@@ -174,6 +175,10 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
                 cout << ","; 
         }
         cout << endl;
+        break;
+    case 5:
+        imprimeLivro(livro);
+        break;
     default:
         break;
     }
@@ -202,6 +207,7 @@ int main(){
     //SERIALIZAÇÃO
     ofstream saidaBinario("SAIDA.bin", ios::binary | ios::app);
     ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
+    cout << endl << "Carregando no arquivo binário..." << endl << endl;
     for(unsigned i=0; i<livros.size(); i++)
         bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile);
     saidaBinario.close();
@@ -229,7 +235,10 @@ int main(){
     //imprimeLivros(livros);
 
     //PARA PESQUISAR LIVRO POR ID
-    efetuarBuscas(bufferBin.arvore, 61625);
+    int pesquisa;
+    cout << "Digite ID do livro para pesquisa: ";
+    cin >> pesquisa;
+    efetuarBuscas(bufferBin.arvore, pesquisa);
 
     saida.close();
     return 0;
