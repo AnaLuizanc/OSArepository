@@ -190,8 +190,7 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    //Buffer bufferTxt("./csvFiles/teste.csv"); // arquivo original
-    Buffer bufferTxt("./csvFiles/booksDataset.csv"); // arquivo menor
+    Buffer bufferTxt("./csvFiles/booksDataset.csv");
     livros = bufferTxt.lerLivrosCsv();
 
     //PARA VERIFICAR SE ESTÁ CERTO
@@ -214,26 +213,24 @@ int main(){
     vector<Indice> indices = retornoDesserializa.second;
     //imprimeLivros(livros);
 
-
     //NOVAS INSERÇÕES DE LIVROS
-    // bufferTxt.fileName = "./csvFiles/novosLivros.csv";
-    // livros = bufferTxt.lerLivrosCsv();
-    // escreveNoArquivo(saida, livros);
-    // saidaBinario.open("SAIDA.bin", ios::binary | ios::app);
-    // saidaBinIndice.open("INDICES.bin", ios::binary | ios::app);
-    // for(unsigned i=0; i<livros.size(); i++)
-    //     bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice);
-    // saidaBinario.close();
-    // saidaBinIndice.close();
-    // retornoDesserializa = bufferBin.lerRegistroFixo();
-    // livros = retornoDesserializa.first;
-    // indices = retornoDesserializa.second;
-    // imprimeLivros(livros);
+    bufferTxt.fileName = "./csvFiles/novosLivros.csv";
+    livros = bufferTxt.lerLivrosCsv();
+    escreveNoArquivo(saida, livros);
+    saidaBinario.open("SAIDA.bin", ios::binary | ios::app);
+    saidaBinIndice.open("INDICES.bin", ios::binary | ios::app);
+    for(unsigned i=0; i<livros.size(); i++)
+        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile);
+    saidaBinario.close();
+    saidaBinIndice.close();
+    retornoDesserializa = bufferBin.lerRegistroFixo();
+    livros = retornoDesserializa.first;
+    indices = retornoDesserializa.second;
+    imprimeLivros(livros);
 
     //PARA PESQUISAR LIVRO POR ID
-    //efetuarBuscas(bufferBin.arvore, 61625);
+    efetuarBuscas(bufferBin.arvore, 61625);
 
     saida.close();
-
     return 0;
 }
