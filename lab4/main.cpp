@@ -190,8 +190,8 @@ int main(){
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    Buffer bufferTxt("./csvFiles/booksDataset.csv"); // arquivo original
-    //Buffer bufferTxt("./csvFiles/datasetmenor.csv"); // arquivo menor
+    //Buffer bufferTxt("./csvFiles/teste.csv"); // arquivo original
+    Buffer bufferTxt("./csvFiles/booksDataset.csv"); // arquivo menor
     livros = bufferTxt.lerLivrosCsv();
 
     //PARA VERIFICAR SE ESTÁ CERTO
@@ -199,12 +199,12 @@ int main(){
     escreveNoArquivo(saida, livros);
 
     Buffer bufferBin("SAIDA.bin");
-
+    string metadataFile = "metadata.bin";
     //SERIALIZAÇÃO
     ofstream saidaBinario("SAIDA.bin", ios::binary | ios::app);
     ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
     for(unsigned i=0; i<livros.size(); i++)
-        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice);
+        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile);
     saidaBinario.close();
     saidaBinIndice.close();
 
@@ -212,7 +212,7 @@ int main(){
     pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
     livros = retornoDesserializa.first;
     vector<Indice> indices = retornoDesserializa.second;
-    imprimeLivros(livros);
+    //imprimeLivros(livros);
 
 
     //NOVAS INSERÇÕES DE LIVROS

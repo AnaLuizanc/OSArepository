@@ -18,7 +18,7 @@ class Buffer {
         }
 
         vector<Livro> lerLivrosCsv();
-        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice);
+        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice, const string& metaDataFile);
         pair<vector<Livro>,vector<Indice>> lerRegistroFixo();
 };
 

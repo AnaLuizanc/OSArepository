@@ -78,33 +78,38 @@ vector<Livro> Buffer::lerLivrosCsv(){
     return livros;
 }
 
-void Buffer::escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice){
-    long tam;
-    ifstream arqbin;
-    arqbin.open(fileName, ios_base::in | ios_base::binary);
-    arqbin.seekg(0, ios_base::end);
-    tam = arqbin.tellg();
 
-    arqbin.seekg(0, ios_base::beg);
+int carregarNrRegistros(const string& metadataFile) {
+    ifstream metaFile(metadataFile, ios::binary);
     int nr_regs = 0;
-    while (arqbin.peek() != EOF) {
-        short int tam;
-        arqbin.read(reinterpret_cast<char*>(&tam), sizeof(tam));
-        if (arqbin.eof()) break;
-        arqbin.seekg(tam, ios_base::cur);
-        nr_regs++;
+    
+    if (metaFile.is_open()) {
+        metaFile.read(reinterpret_cast<char*>(&nr_regs), sizeof(nr_regs));
+        metaFile.close();
     }
-    arqbin.close();
+    
+    return nr_regs;
+}
 
-    pair<string,int> retorno = liv.packFixed();
+// Função para atualizar o número de registros no arquivo de metadados
+void salvarNrRegistros(const string& metadataFile, int nr_regs) {
+    ofstream metaFile(metadataFile, ios::binary | ios::trunc);
+    if (metaFile.is_open()) {
+        metaFile.write(reinterpret_cast<const char*>(&nr_regs), sizeof(nr_regs));
+        metaFile.close();
+    }
+}
+
+void Buffer::escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice, const string& metaDataFile){
+    int nr_regs = carregarNrRegistros(metaDataFile);
+
+    pair<string, int> retorno = liv.packFixed();
     buffer = retorno.first;
     int id = retorno.second;
     short int tamanho = buffer.size();
 
     saidaBinario.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
     saidaBinario.write(buffer.c_str(), tamanho);
-
-    buffer.clear();
 
     // SERIALIZAÇÃO DO ARQUIVO DE INDICES
     Indice indice(id, nr_regs+1);
@@ -115,6 +120,9 @@ void Buffer::escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofst
 
     saidaBinIndice.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
     saidaBinIndice.write(buffer.c_str(), tamanho);
+
+    nr_regs++;
+    salvarNrRegistros(metaDataFile, nr_regs);
 }
 
 pair<vector<Livro>,vector<Indice>> Buffer::lerRegistroFixo(){
