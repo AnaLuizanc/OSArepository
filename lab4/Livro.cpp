@@ -41,6 +41,14 @@ void Livro::unpackFixed(const string& buffer){
     titulo = bufferAux.substr(0, delimiter);
     bufferAux = bufferAux.substr(delimiter+1, bufferAux.size());
 
+    if(id == 29719){
+        int countChar = 0;
+        while(countChar < 2){
+            delimiter = bufferAux.find('|', 0);
+            bufferAux = bufferAux.substr(0, delimiter);
+            countChar++;
+        }
+    }
     delimiter = bufferAux.find('|', 0);
     stringstream ssAutores(bufferAux.substr(0, delimiter));
     string autor;
