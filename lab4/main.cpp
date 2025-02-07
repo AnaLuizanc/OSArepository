@@ -103,7 +103,7 @@ int pesquisaIndice(ArvoreBinaria<Indice>& arvore, int id) {
 }
 
 Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
-    if(pesquisaIndice(arvore,id)){
+    if(pesquisaIndice(arvore,id) != -1){
         int posicao = pesquisaIndice(arvore,id);
         Livro livro;
         ifstream arqbin;
@@ -144,45 +144,48 @@ Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
 }
 
 void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
-    int opcao;
-    cout << endl << "1. Titulo do livro" << endl;
-    cout << "2. Autor(es) do livro" << endl;
-    cout << "3. Data de publicacao do livro" << endl;
-    cout << "4. Categoria(s) do livro" << endl;
-    cout << "5. Tudo" << endl;
-    cout << "Deseja buscar por qual opcao? ";
-    cin >> opcao;
-    Livro livro = pesquisaLivro(arvore, id);
-    switch (opcao){
-    case 1:
-        cout << livro.titulo << endl;
-        break;
-    case 2:
-        for(unsigned i=0; i<livro.autores.size(); i++){
-            cout << livro.autores[i];
-            if(i + 1 < livro.autores.size())
-                cout << ","; 
+    if(pesquisaIndice(arvore, id) != -1){
+        int opcao;
+        cout << endl << "1. Titulo do livro" << endl;
+        cout << "2. Autor(es) do livro" << endl;
+        cout << "3. Data de publicacao do livro" << endl;
+        cout << "4. Categoria(s) do livro" << endl;
+        cout << "5. Tudo" << endl;
+        cout << "Deseja buscar por qual opcao? ";
+        cin >> opcao;
+        Livro livro = pesquisaLivro(arvore, id);
+        switch (opcao){
+        case 1:
+            cout << livro.titulo << endl;
+            break;
+        case 2:
+            for(unsigned i=0; i<livro.autores.size(); i++){
+                cout << livro.autores[i];
+                if(i + 1 < livro.autores.size())
+                    cout << ","; 
+            }
+            cout << endl;
+            break;
+        case 3:
+            cout << livro.ano << endl;
+            break;
+        case 4:
+            for(unsigned i=0; i<livro.categorias.size(); i++){
+                cout << livro.categorias[i];
+                if(i + 1 < livro.categorias.size())
+                    cout << ","; 
+            }
+            cout << endl;
+            break;
+        case 5:
+            imprimeLivro(livro);
+            break;
+        default:
+            break;
         }
-        cout << endl;
-        break;
-    case 3:
-        cout << livro.ano << endl;
-        break;
-    case 4:
-        for(unsigned i=0; i<livro.categorias.size(); i++){
-            cout << livro.categorias[i];
-            if(i + 1 < livro.categorias.size())
-                cout << ","; 
-        }
-        cout << endl;
-        break;
-    case 5:
-        imprimeLivro(livro);
-        break;
-    default:
-        break;
     }
-
+    else
+        cout << "Não existe livro com esse ID!" << endl;
 }
 
 //------------------------------------------------------//
