@@ -19,14 +19,13 @@ class BTreeNode{
 template <typename T>
 class BTree {
     private:
-        BTreeNode<T>* root; // Pointer to root node
+        BTreeNode<T>* raiz; // Ponteiro para o nó da raiz
         int ordem;
 
-        
 
     public:
-        BTree(int order) : order(order) {
-            root = new BTreeNode<T>(order, true);
+        BTree(int ordem) : ordem(ordem) {
+            raiz = new BTreeNode<T>(ordem, true);
         }
 
 
