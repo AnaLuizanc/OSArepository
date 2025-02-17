@@ -34,17 +34,10 @@ class Livro {
                     data += ",";
             }
         
-            ofstream saidaTxt;
-            saidaTxt.open("saidapack.dat", ios_base::app);
-        
-            saidaTxt << data.size() << data << endl;
-        
             string buffer(data.size() + sizeof(short int), '\0');
             strncpy(&buffer[0], to_string(data.size()).c_str(), sizeof(short int));
             strncpy(&buffer[sizeof(short int)], data.c_str(), data.size());
-        
-            saidaTxt.close();
-        
+    
             return make_pair(buffer,id);
         }
 
@@ -118,16 +111,9 @@ class Indice {
 
         string packFixed() const{
             string data = to_string(id) + "|" + to_string(endereco);
-        
-            ofstream saidaTxt;
-            saidaTxt.open("indices.dat", ios_base::app);
-        
-            saidaTxt << data << endl;
-        
+
             string buffer(data.size(), '\0');
             strncpy(&buffer[0], data.c_str(), data.size());
-        
-            saidaTxt.close();
         
             return buffer;
         }
