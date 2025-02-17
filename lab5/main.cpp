@@ -537,6 +537,23 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
         cout << "Não existe livro com esse ID!" << endl;
 }
 
+void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, string search){
+    auto it = mapa.find(search);
+    vector<int> ids;
+    if(it != mapa.end()){
+        cout << "Found '" << search << "' with IDs: ";
+        for (int id : it->second) {
+            cout << id << " ";
+            ids.push_back(id);
+        }
+        cout << endl;
+    } else
+        cout << "'" << search << "'  not found in the map." << endl;
+
+    for(auto i : ids)
+        efetuarBuscas(bufferBin.arvore, i);
+}
+
 //--------------------------------------------------------//
 
 int main() {
@@ -578,21 +595,7 @@ int main() {
         cout << endl;
     }
 
-    auto it = mapa.find("book");
-    vector<int> ids;
-    if (it != mapa.end()) {
-        cout << "Found 'book' with IDs: ";
-        for (int id : it->second) {
-            cout << id << " ";
-            ids.push_back(id);
-        }
-        cout << endl;
-    } else {
-        cout << "'book' not found in the map." << endl;
-    }
-
-    for(auto i : ids)
-        efetuarBuscas(bufferBin.arvore, i);
+    efetuaBuscaMapa(mapa, bufferBin, "book");
 
     //DESSERIALIAÇÃO
     // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
