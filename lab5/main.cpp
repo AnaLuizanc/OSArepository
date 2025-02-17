@@ -173,8 +173,10 @@ class IndiceSecundario{
             stringstream ss(text);
             string palavra;
             
-            while(ss >> palavra)
-                mapeamento[palavra].push_back(ind.id);
+            while(ss >> palavra){
+                auto it = lower_bound(mapeamento[palavra].begin(), mapeamento[palavra].end(), ind.id);
+                mapeamento[palavra].insert(it, ind.id);
+            }
         }
 };
 
@@ -482,6 +484,7 @@ int main() {
     saidaBinario.close();
     saidaBinIndice.close();
 
+    //PARA MOSTRAR O MAPEAMENTO
     map<string,vector<int>> m = bufferBin.hash.mapeamento;
     for (const auto& entry : m) {
         cout << entry.first << " -> ";
