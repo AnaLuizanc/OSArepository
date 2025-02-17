@@ -227,6 +227,95 @@ class Buffer {
         
             return livros;
         }
+
+        int carregarNrRegistros(const string& metadataFile) {
+            ifstream metaFile(metadataFile, ios::binary);
+            int nr_regs = 0;
+            
+            if (metaFile.is_open()) {
+                metaFile.read(reinterpret_cast<char*>(&nr_regs), sizeof(nr_regs));
+                metaFile.close();
+            }
+            
+            return nr_regs;
+        }
+        
+        // Função para atualizar o número de registros no arquivo de metadados
+        void salvarNrRegistros(const string& metadataFile, int nr_regs) {
+            ofstream metaFile(metadataFile, ios::binary | ios::trunc);
+            if (metaFile.is_open()) {
+                metaFile.write(reinterpret_cast<const char*>(&nr_regs), sizeof(nr_regs));
+                metaFile.close();
+            }
+        }
+        
+        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice, const string& metaDataFile){
+            int nr_regs = carregarNrRegistros(metaDataFile);
+        
+            pair<string, int> retorno = liv.packFixed();
+            buffer = retorno.first;
+            int id = retorno.second;
+            short int tamanho = buffer.size();
+        
+            saidaBinario.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            saidaBinario.write(buffer.c_str(), tamanho);
+        
+            // SERIALIZAÇÃO DO ARQUIVO DE INDICES
+            Indice indice(id, nr_regs+1);
+            arvore.Inserir(indice);
+        
+            buffer = indice.packFixed();
+            tamanho = buffer.size();
+        
+            saidaBinIndice.write(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            saidaBinIndice.write(buffer.c_str(), tamanho);
+        
+            nr_regs++;
+            salvarNrRegistros(metaDataFile, nr_regs);
+        }
+        
+        pair<vector<Livro>,vector<Indice>> lerRegistroFixo(){
+            vector<Livro> livros;
+            ifstream arquivoBin(fileName, ios_base::binary | ios_base::in);
+            while(arquivoBin.peek() != EOF){
+                short int tamanhoReg;
+        
+                arquivoBin.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+                if(arquivoBin.eof()) break;
+        
+                string buffer(tamanhoReg, '\0');
+        
+                if(arquivoBin.eof()) break;
+                arquivoBin.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+        
+                Livro livro;
+                livro.unpackFixed(buffer);
+                livros.push_back(livro);
+            }
+            arquivoBin.close();
+        
+            // DESSERIALIZAÇÃO DO ARQUIVO DE ÍNDICES
+            vector<Indice> indices;
+            ifstream arquivoBinIndice("INDICES.bin", ios_base::binary | ios_base::in);
+            while(arquivoBinIndice.peek() != EOF){
+                short int tamanhoReg;
+        
+                arquivoBinIndice.read(reinterpret_cast<char*>(&tamanhoReg), sizeof(tamanhoReg));
+                if(arquivoBinIndice.eof()) break;
+        
+                string buffer(tamanhoReg, '\0');
+        
+                if(arquivoBinIndice.eof()) break;
+                arquivoBinIndice.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+        
+                Indice indice;
+                indice.unpackFixed(buffer);
+                indices.push_back(indice);
+            }
+            arquivoBinIndice.close();
+        
+            return make_pair(livros, indices);
+        }
 };
 
 pair<set<string>,set<string>> CarregarStopwordAndSimbols(const string &arq, const string& arqSimbols){
@@ -360,6 +449,23 @@ int main() {
     //PARA VERIFICAR SE ESTÁ CERTO
     imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
+
+    Buffer bufferBin("SAIDA.bin");
+    string metadataFile = "metadata.bin";
+    //SERIALIZAÇÃO
+    ofstream saidaBinario("SAIDA.bin", ios::binary | ios::app);
+    ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
+    cout << endl << "Carregando no arquivo binário..." << endl << endl;
+    for(unsigned i=0; i<livros.size(); i++)
+        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile);
+    saidaBinario.close();
+    saidaBinIndice.close();
+
+    //DESSERIALIAÇÃO
+    pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
+    livros = retornoDesserializa.first;
+    vector<Indice> indices = retornoDesserializa.second;
+    imprimeLivros(livros);
 
     return 0;
 }
