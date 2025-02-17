@@ -479,7 +479,63 @@ void imprimeLivro(Livro liv){
     cout << "}\n";
 }
 
+int pesquisaIndice(ArvoreBinaria<Indice>& arvore, int id) {
+    Indice* resultado = arvore.BuscarObjeto(Indice(id, 0));
+    if (resultado != NULL)
+        return resultado->endereco;
+    else
+        return -1;
+}
 
+Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id){
+    if(pesquisaIndice(arvore,id) != -1){
+        int posicao = pesquisaIndice(arvore,id);
+        Livro livro;
+        ifstream arqbin;
+        arqbin.open("SAIDA.bin", ios_base::in | ios_base::binary);
+        arqbin.seekg(0, ios_base::end);
+        
+        arqbin.seekg(0, ios_base::beg);
+        int nr_regs = 0;
+        while (arqbin.peek() != EOF) {
+            short int tamanho;
+            arqbin.read(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+            if (arqbin.eof()) break;
+            arqbin.seekg(tamanho, ios_base::cur);
+            nr_regs++;
+        }
+
+        string buffer;
+        if(posicao > 0){
+            if(posicao <= nr_regs){
+                arqbin.seekg(0, ios_base::beg);
+                for (int i = 0; i < posicao; i++) {
+                    short int tamanho;
+                    arqbin.read(reinterpret_cast<char*>(&tamanho), sizeof(tamanho));
+                    buffer.resize(tamanho);
+                    arqbin.read(&buffer[0], tamanho);
+                }
+                livro.unpackFixed(buffer);
+            }
+            else
+                cout << "Posicao nao existe" << endl;
+        }
+        
+        arqbin.close();
+
+        return livro;
+    }
+    return Livro();
+}
+
+void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
+    if(pesquisaIndice(arvore, id) != -1){
+        Livro livro = pesquisaLivro(arvore, id);
+        imprimeLivro(livro);
+    }
+    else
+        cout << "Não existe livro com esse ID!" << endl;
+}
 
 //--------------------------------------------------------//
 
