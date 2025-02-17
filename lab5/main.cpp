@@ -88,11 +88,63 @@ class Livro {
         }
 };
 
+class Indice {
+    public:
+        int id;
+        int endereco;
+
+        Indice() : id(0), endereco(0) {}
+
+        Indice(int id) : id(id) {}
+
+        Indice(int id, int endereco) : id(id), endereco(endereco) {}
+
+        bool operator<(const Indice& other) const {
+            return id < other.id;
+        }
+
+        bool operator>(const Indice& other) const {
+            return id > other.id;
+        }
+
+        bool operator==(const Indice& other) const {
+            return id == other.id;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const Indice& indice) {
+            os << indice.id << " - " << indice.endereco << endl;
+            return os;
+        }
+
+        string packFixed() const{
+            string data = to_string(id) + "|" + to_string(endereco);
+        
+            ofstream saidaTxt;
+            saidaTxt.open("indices.dat", ios_base::app);
+        
+            saidaTxt << data << endl;
+        
+            string buffer(data.size(), '\0');
+            strncpy(&buffer[0], data.c_str(), data.size());
+        
+            saidaTxt.close();
+        
+            return buffer;
+        }
+
+        void unpackFixed(const string& buffer){
+            int delimiter = buffer.find('|', 0);
+            
+            id = stoi(buffer.substr(0, delimiter));
+            endereco = stoi(buffer.substr(delimiter+1, buffer.size()-1));
+        }
+};
+
 class Buffer {
     public:
         string fileName;
         string buffer;
-        //ArvoreBinaria<Indice> arvore;
+        ArvoreBinaria<Indice> arvore;
 
         Buffer(const string& fileName){
             this->fileName = fileName;
