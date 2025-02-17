@@ -454,6 +454,33 @@ void escreveNoArquivo(ofstream& saida, vector<Livro> liv){
     }
 }
 
+void imprimeLivro(Livro liv){
+    cout << liv.id << " - ";
+    cout << liv.titulo << " - ";
+    vector<string> autores = liv.autores;
+
+    cout << "{";
+    for(unsigned j=0; j<autores.size(); j++){
+        cout << autores[j];
+        if(j + 1 < autores.size())
+            cout << ",";
+    }
+    cout << "} - ";
+
+    cout << liv.ano << " - ";
+    vector<string> categorias = liv.categorias;
+
+    cout << "{";
+    for(unsigned j=0; j<categorias.size(); j++){
+        cout << categorias[j];
+        if(j+1 < categorias.size())
+            cout << ",";
+    }
+    cout << "}\n";
+}
+
+
+
 //--------------------------------------------------------//
 
 int main() {
@@ -485,8 +512,8 @@ int main() {
     saidaBinIndice.close();
 
     //PARA MOSTRAR O MAPEAMENTO
-    map<string,vector<int>> m = bufferBin.hash.mapeamento;
-    for (const auto& entry : m) {
+    map<string,vector<int>> mapa = bufferBin.hash.mapeamento;
+    for (const auto& entry : mapa) {
         cout << entry.first << " -> ";
         for (size_t i = 0; i < entry.second.size(); ++i) {
             cout << entry.second[i];
@@ -494,6 +521,8 @@ int main() {
         }
         cout << endl;
     }
+
+
 
     //DESSERIALIAÇÃO
     // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
