@@ -7,6 +7,8 @@
 #include <utility>
 #include <cstring>
 #include <algorithm>
+#include <cctype>
+#include <map>
 
 #include "Arvore.h"
 
@@ -126,11 +128,62 @@ class Indice {
         }
 };
 
+string toLowerCase(string& word){
+    string lower;
+    for(char c : word)
+        lower += tolower(c);
+    return lower;
+}
+
+// Função de filtragem
+string removerStopwordsAndSimbols(const string &texto, const pair<set<string>,set<string>> &ignore) {
+    istringstream iss(texto);
+    ostringstream oss;
+    string palavra;
+    set<string> stopwords = ignore.first;
+    set<string> simbols = ignore.second;
+
+    while (iss >> palavra) {
+        palavra = toLowerCase(palavra);
+        // Remover símbolos da palavra
+        for(const string& simbolo : simbols){
+            size_t pos;
+            while ((pos = palavra.find(simbolo)) != string::npos)
+            palavra.erase(pos, simbolo.length());
+        }
+        
+        if (stopwords.find(palavra) == stopwords.end()) // Se a palavra não for uma stopword
+            oss << palavra << " ";
+    }
+    return oss.str();
+}
+
+class IndiceSecundario{
+    public:
+        int id;
+        string titulo;
+        map<string,vector<int>> mapeamento;
+
+        IndiceSecundario(){}
+
+        IndiceSecundario(int id, string titulo) : id(id), titulo(titulo){}
+
+        void mapeamentoPalavras(IndiceSecundario& ind, pair<set<string>,set<string>> ignore){
+            string text = removerStopwordsAndSimbols(ind.titulo, ignore);
+            stringstream ss(text);
+            string palavra;
+            
+            while(ss >> palavra)
+                mapeamento[palavra].push_back(ind.id);
+        }
+};
+
 class Buffer {
     public:
         string fileName;
         string buffer;
         ArvoreBinaria<Indice> arvore;
+        IndiceSecundario hash;
 
         Buffer(const string& fileName){
             this->fileName = fileName;
@@ -235,7 +288,7 @@ class Buffer {
             }
         }
         
-        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice, const string& metaDataFile){
+        void escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofstream&saidaBinIndice, const string& metaDataFile, pair<set<string>,set<string>> ignore){
             int nr_regs = carregarNrRegistros(metaDataFile);
         
             pair<string, int> retorno = liv.packFixed();
@@ -258,6 +311,10 @@ class Buffer {
         
             nr_regs++;
             salvarNrRegistros(metaDataFile, nr_regs);
+
+            IndiceSecundario indS(id, liv.titulo);
+            hash.mapeamentoPalavras(indS, ignore);
+            
         }
         
         pair<vector<Livro>,vector<Indice>> lerRegistroFixo(){
@@ -341,28 +398,6 @@ pair<set<string>,set<string>> CarregarStopwordAndSimbols(const string &arq, cons
     return make_pair(stopwords,simbols);
 }
 
-// Função de filtragem
-string removerStopwordsAndSimbols(const string &texto, const pair<set<string>,set<string>> &ignore) {
-    istringstream iss(texto);
-    ostringstream oss;
-    string palavra;
-    set<string> stopwords = ignore.first;
-    set<string> simbols = ignore.second;
-
-    while (iss >> palavra) {
-        // Remover símbolos da palavra
-        for(const string& simbolo : simbols){
-            size_t pos;
-            while ((pos = palavra.find(simbolo)) != string::npos)
-            palavra.erase(pos, simbolo.length());
-        }
-        
-        if (stopwords.find(palavra) == stopwords.end()) // Se a palavra não for uma stopword
-            oss << palavra << " ";
-    }
-    return oss.str();
-}
-
 
 //------------ESPAÇO PARA FUNÇÕES AUXILIARES------------//
 
@@ -433,7 +468,7 @@ int main() {
     livros = bufferTxt.lerLivrosCsv();
 
     //PARA VERIFICAR SE ESTÁ CERTO
-    imprimeLivros(livros);
+    // imprimeLivros(livros);
     escreveNoArquivo(saida, livros);
 
     Buffer bufferBin("SAIDA.bin");
@@ -443,15 +478,25 @@ int main() {
     ofstream saidaBinIndice("INDICES.bin", ios::binary | ios::app);
     cout << endl << "Carregando no arquivo binário..." << endl << endl;
     for(unsigned i=0; i<livros.size(); i++)
-        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile);
+        bufferBin.escreverRegistroFixo(livros[i], saidaBinario, saidaBinIndice, metadataFile, ignore);
     saidaBinario.close();
     saidaBinIndice.close();
 
+    map<string,vector<int>> m = bufferBin.hash.mapeamento;
+    for (const auto& entry : m) {
+        cout << entry.first << " -> ";
+        for (size_t i = 0; i < entry.second.size(); ++i) {
+            cout << entry.second[i];
+            if (i < entry.second.size() - 1) cout << ", ";
+        }
+        cout << endl;
+    }
+
     //DESSERIALIAÇÃO
-    pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
-    livros = retornoDesserializa.first;
-    vector<Indice> indices = retornoDesserializa.second;
-    imprimeLivros(livros);
+    // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
+    // livros = retornoDesserializa.first;
+    // vector<Indice> indices = retornoDesserializa.second;
+    // imprimeLivros(livros);
 
     return 0;
 }
