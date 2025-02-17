@@ -578,7 +578,21 @@ int main() {
         cout << endl;
     }
 
+    auto it = mapa.find("book");
+    vector<int> ids;
+    if (it != mapa.end()) {
+        cout << "Found 'book' with IDs: ";
+        for (int id : it->second) {
+            cout << id << " ";
+            ids.push_back(id);
+        }
+        cout << endl;
+    } else {
+        cout << "'book' not found in the map." << endl;
+    }
 
+    for(auto i : ids)
+        efetuarBuscas(bufferBin.arvore, i);
 
     //DESSERIALIAÇÃO
     // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
