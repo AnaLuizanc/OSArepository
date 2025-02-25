@@ -537,21 +537,42 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
         cout << "Não existe livro com esse ID!" << endl;
 }
 
-void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, string search){
-    auto it = mapa.find(search);
-    vector<int> ids;
-    if(it != mapa.end()){
-        cout << "Found '" << search << "' with IDs: ";
-        for (int id : it->second) {
-            cout << id << " ";
-            ids.push_back(id);
+void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<string> search){
+    if(search.size() > 1){
+        vector<int> conjunto1 = mapa.find(search[0])->second;
+        vector<int> conjunto2 = mapa.find(search[1])->second;
+        vector<int> intersec;
+        set_intersection(conjunto1.begin(), conjunto1.end(), conjunto2.begin(), conjunto2.end(), back_inserter(intersec));
+        for(int i=2; i<search.size(); i++){
+            conjunto1 = mapa.find(search[i])->second;
+            conjunto2 = intersec;
+            intersec.clear();
+            set_intersection(conjunto1.begin(), conjunto1.end(), conjunto2.begin(), conjunto2.end(), back_inserter(intersec));
         }
-        cout << endl;
-    } else
-        cout << "'" << search << "'  not found in the map." << endl;
+        cout << "Foram encontrados " << intersec.size() << " ocorrências." << endl;
+        for(auto i : intersec)
+            efetuarBuscas(bufferBin.arvore, i);
+    }
+    else{
+        auto it = mapa.find(search[0]);
+        vector<int> ids;
+        if(it != mapa.end()){
+            for(int id : it->second)
+                ids.push_back(id);
+        }
+        cout << "Foram encontrados " << ids.size() << " ocorrências." << endl;
+        for(auto i : ids)
+            efetuarBuscas(bufferBin.arvore, i);
+    }
+}
 
-    for(auto i : ids)
-        efetuarBuscas(bufferBin.arvore, i);
+vector<string> splitString(string s){
+    vector<string> splited;
+    istringstream iss(s);
+    string palavra;
+    while(iss >> palavra)
+        splited.push_back(palavra);
+    return splited;
 }
 
 //--------------------------------------------------------//
@@ -566,7 +587,8 @@ int main() {
     vector<Livro> livros; //lidos do arquivo txt
 
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    Buffer bufferTxt("teste.csv");
+    //Buffer bufferTxt("teste.csv");
+    Buffer bufferTxt("booksDataset.csv");
     livros = bufferTxt.lerLivrosCsv();
 
     //PARA VERIFICAR SE ESTÁ CERTO
@@ -586,16 +608,23 @@ int main() {
 
     //PARA MOSTRAR O MAPEAMENTO
     map<string,vector<int>> mapa = bufferBin.hash.mapeamento;
-    for (const auto& entry : mapa) {
-        cout << entry.first << " -> ";
-        for (size_t i = 0; i < entry.second.size(); ++i) {
-            cout << entry.second[i];
-            if (i < entry.second.size() - 1) cout << ", ";
-        }
-        cout << endl;
-    }
+    // for (const auto& entry : mapa) {
+    //     cout << entry.first << " -> ";
+    //     for (size_t i = 0; i < entry.second.size(); ++i) {
+    //         cout << entry.second[i];
+    //         if (i < entry.second.size() - 1) cout << ", ";
+    //     }
+    //     cout << endl;
+    // }
 
-    efetuaBuscaMapa(mapa, bufferBin, "book");
+    string search;
+    cout << "Digite o que procura: ";
+    getline(cin, search);
+    search = removerStopwordsAndSimbols(search, ignore);
+    search.erase(remove_if(search.end()-1, search.end(), ::isspace), search.end());
+    vector<string> palavras = splitString(search);
+    efetuaBuscaMapa(mapa, bufferBin, palavras);
+
 
     //DESSERIALIAÇÃO
     // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
