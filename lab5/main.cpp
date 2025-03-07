@@ -537,7 +537,7 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
         cout << "Não existe livro com esse ID!" << endl;
 }
 
-void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<string> search){
+vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<string> search){
     if(search.size() > 1){
         vector<int> conjunto1 = mapa.find(search[0])->second;
         vector<int> conjunto2 = mapa.find(search[1])->second;
@@ -549,9 +549,7 @@ void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<str
             intersec.clear();
             set_intersection(conjunto1.begin(), conjunto1.end(), conjunto2.begin(), conjunto2.end(), back_inserter(intersec));
         }
-        cout << "Foram encontrados " << intersec.size() << " ocorrências." << endl;
-        for(auto i : intersec)
-            efetuarBuscas(bufferBin.arvore, i);
+        return intersec;
     }
     else{
         auto it = mapa.find(search[0]);
@@ -560,9 +558,7 @@ void efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<str
             for(int id : it->second)
                 ids.push_back(id);
         }
-        cout << "Foram encontrados " << ids.size() << " ocorrências." << endl;
-        for(auto i : ids)
-            efetuarBuscas(bufferBin.arvore, i);
+        return ids;
     }
 }
 
@@ -617,20 +613,21 @@ int main() {
     //     cout << endl;
     // }
 
+    //DESSERIALIAÇÃO
+    pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
+    livros = retornoDesserializa.first;
+    vector<Indice> indices = retornoDesserializa.second;
+    
     string search;
     cout << "Digite o que procura: ";
     getline(cin, search);
     search = removerStopwordsAndSimbols(search, ignore);
     search.erase(remove_if(search.end()-1, search.end(), ::isspace), search.end());
     vector<string> palavras = splitString(search);
-    efetuaBuscaMapa(mapa, bufferBin, palavras);
-
-
-    //DESSERIALIAÇÃO
-    // pair<vector<Livro>,vector<Indice>> retornoDesserializa = bufferBin.lerRegistroFixo();
-    // livros = retornoDesserializa.first;
-    // vector<Indice> indices = retornoDesserializa.second;
-    // imprimeLivros(livros);
+    vector<int> ids = efetuaBuscaMapa(mapa, bufferBin, palavras);
+    cout << "Foram encontrados " << ids.size() << " ocorrências." << endl;
+    for (auto i : ids)
+        efetuarBuscas(bufferBin.arvore, i);
 
     return 0;
 }
