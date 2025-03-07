@@ -430,30 +430,6 @@ void imprimeLivros(vector<Livro> liv){
     }
 }
 
-void escreveNoArquivo(ofstream& saida, vector<Livro> liv){
-    for(unsigned i=0; i<liv.size(); i++){
-        saida << liv[i].id << " - ";
-        saida << liv[i].titulo << " - ";
-        vector<string> autores = liv[i].autores;
-        saida << "{";
-        for(unsigned j=0; j<autores.size(); j++){
-            saida << autores[j];
-            if(j + 1 < autores.size())
-                saida << ",";
-        }
-        saida << "} - ";
-        saida << liv[i].ano << " - ";
-        vector<string> categorias = liv[i].categorias;
-        saida << "{";
-        for(unsigned j=0; j<categorias.size(); j++){
-            saida << categorias[j];
-            if(j+1 < categorias.size())
-                saida << ",";
-        }
-        saida << "}" << endl;
-    }
-}
-
 void imprimeLivro(Livro liv){
     cout << liv.id << " - ";
     cout << liv.titulo << " - ";
@@ -577,19 +553,9 @@ int main() {
     //CARREGANDO STOPWORDS E SIMBOLOS
     pair<set<string>,set<string>> ignore = CarregarStopwordAndSimbols("stopwords_en.txt", "pontuacoes.txt");
 
-    ofstream saida;
-    saida.open("SAIDA.dat", ios_base::out); //abre para escrita
-
-    vector<Livro> livros; //lidos do arquivo txt
-
     //LEITURA DOS LIVROS DO ARQUIVO CSV
-    //Buffer bufferTxt("teste.csv");
     Buffer bufferTxt("booksDataset.csv");
-    livros = bufferTxt.lerLivrosCsv();
-
-    //PARA VERIFICAR SE ESTÁ CERTO
-    // imprimeLivros(livros);
-    escreveNoArquivo(saida, livros);
+    vector<Livro> livros = bufferTxt.lerLivrosCsv();
 
     Buffer bufferBin("SAIDA.bin");
     string metadataFile = "metadata.bin";
