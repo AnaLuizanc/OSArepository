@@ -1,7 +1,7 @@
 #include "functions.hpp"
 #include "Buffer.hpp"
 
-pair<set<string>,set<string>> CarregarStopwordAndSimbols(const string &arq, const string& arqSimbols){ // ok
+pair<set<string>,set<string>> CarregarStopwordAndSimbols(const string &arq, const string& arqSimbols){
     set<string> stopwords, simbols;
     ifstream arquivo(arq), arquivoSimbols(arqSimbols);
     string palavra, simbolo;
@@ -45,7 +45,6 @@ string toLowerCase(string& word){
     return lower;
 }
 
-// Função de filtragem
 string removerStopwordsAndSimbols(const string &texto, const pair<set<string>,set<string>> &ignore) {
     istringstream iss(texto);
     ostringstream oss;
@@ -59,7 +58,7 @@ string removerStopwordsAndSimbols(const string &texto, const pair<set<string>,se
         for(const string& simbolo : simbols){
             size_t pos;
             while ((pos = palavra.find(simbolo)) != string::npos)
-            palavra.erase(pos, simbolo.length());
+                palavra.erase(pos, simbolo.length());
         }
         
         if (stopwords.find(palavra) == stopwords.end()) // Se a palavra não for uma stopword
@@ -160,7 +159,7 @@ void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id){
         cout << "Não existe livro com esse ID!" << endl;
 }
 
-vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<string> search){
+vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, vector<string> search){
     if(search.size() > 1){
         vector<int> conjunto1 = mapa.find(search[0])->second;
         vector<int> conjunto2 = mapa.find(search[1])->second;

@@ -104,7 +104,6 @@ void Buffer::escreverRegistroFixo(const Livro& liv, ofstream& saidaBinario, ofst
 
     IndiceSecundario indS(id, liv.titulo);
     hash.mapeamentoPalavras(indS, ignore);
-    
 }
 
 pair<vector<Livro>,vector<Indice>> Buffer::lerRegistroFixo(){

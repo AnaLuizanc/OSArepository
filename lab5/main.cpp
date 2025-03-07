@@ -56,7 +56,7 @@ int main() {
     search = removerStopwordsAndSimbols(search, ignore);
     search.erase(remove_if(search.end()-1, search.end(), ::isspace), search.end());
     vector<string> palavras = splitString(search);
-    vector<int> ids = efetuaBuscaMapa(mapa, bufferBin, palavras);
+    vector<int> ids = efetuaBuscaMapa(mapa, palavras);
     cout << "Foram encontrados " << ids.size() << " ocorrências." << endl;
     for (auto i : ids)
         efetuarBuscas(bufferBin.arvore, i);

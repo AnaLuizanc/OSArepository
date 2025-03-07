@@ -30,6 +30,6 @@ void imprimeLivro(Livro liv);
 int pesquisaIndice(ArvoreBinaria<Indice>& arvore, int id);
 Livro pesquisaLivro(ArvoreBinaria<Indice>& arvore, int id);
 void efetuarBuscas(ArvoreBinaria<Indice>& arvore, int id);
-vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, Buffer& bufferBin, vector<string> search);
+vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, vector<string> search);
 
 #endif
