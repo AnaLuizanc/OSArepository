@@ -165,7 +165,7 @@ vector<int> efetuaBuscaMapa(map<string,vector<int>> mapa, vector<string> search)
         vector<int> conjunto2 = mapa.find(search[1])->second;
         vector<int> intersec;
         set_intersection(conjunto1.begin(), conjunto1.end(), conjunto2.begin(), conjunto2.end(), back_inserter(intersec));
-        for(int i=2; i<search.size(); i++){
+        for(unsigned i=2; i<search.size(); i++){
             conjunto1 = mapa.find(search[i])->second;
             conjunto2 = intersec;
             intersec.clear();
