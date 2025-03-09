@@ -4,11 +4,10 @@
 using namespace std;
 
 // class for the node present in a B-Tree
-template <typename T>
 class BTreeNode {
 public:
     // Vector of keys
-    vector<T> keys;
+    vector<int> keys;
     // Vector of child pointers
     vector<BTreeNode*> children;
     // Current number of keys
@@ -23,16 +22,15 @@ public:
 };
 
 // class for B-Tree
-template <typename T>
 class BTree {
 private:
-    BTreeNode<T>* root; // Pointer to root node
+    BTreeNode* root; // Pointer to root node
     int order; // Order of the B-Tree
 
     // Function to split a full child node
-    void splitChild(BTreeNode<T>* x, int i) { //i = posição do ponteiro do filho
-        BTreeNode<T>* y = x->children[i];
-        BTreeNode<T>* z = new BTreeNode<T>(order, y->leaf);
+    void splitChild(BTreeNode* x, int i) { //i = posição do ponteiro do filho
+        BTreeNode* y = x->children[i];
+        BTreeNode* z = new BTreeNode(order, y->leaf);
         z->n = order;
 
         for (int j = 0; j < order; j++)
@@ -51,7 +49,7 @@ private:
     }
 
     // Function to insert a key in a non-full node
-    void insertNonFull(BTreeNode<T>* x, T k) {
+    void insertNonFull(BTreeNode* x, int k) {
         int i = x->n - 1;
 
         if (x->leaf) {
@@ -77,7 +75,7 @@ private:
         }
     }
 
-    void imprime(BTreeNode<T>* root){
+    void imprime(BTreeNode* root){
         cout << "(";
         for(int i=0; i<root->n; i++){
             cout << root->keys[i];
@@ -97,7 +95,7 @@ private:
     }
 
     // Function to search a key in the tree
-    bool search(BTreeNode<T>* x, T k) {
+    bool search(BTreeNode* x, int k) {
         int i = 0;
         while (i < x->n && k > x->keys[i])
             i++;
@@ -112,23 +110,23 @@ private:
     }
 
     // Function to find the predecessor
-T getPredecessor(BTreeNode<T>* node, int idx) {
-    BTreeNode<T>* current = node->children[idx];
+int getPredecessor(BTreeNode* node, int idx) {
+    BTreeNode* current = node->children[idx];
     while (!current->leaf)
         current = current->children[current->n];
     return current->keys[current->n - 1];
 }
 
 // Function to find the successor
-T getSuccessor(BTreeNode<T>* node, int idx) {
-    BTreeNode<T>* current = node->children[idx + 1];
+int getSuccessor(BTreeNode* node, int idx) {
+    BTreeNode* current = node->children[idx + 1];
     while (!current->leaf)
         current = current->children[0];
     return current->keys[0];
 }
 
 // Function to fill child node
-void fill(BTreeNode<T>* node, int idx) {
+void fill(BTreeNode* node, int idx) {
     if (idx != 0 && node->children[idx - 1]->n >= order)
         borrowFromPrev(node, idx);
     else if (idx != node->n && node->children[idx + 1]->n >= order)
@@ -142,9 +140,9 @@ void fill(BTreeNode<T>* node, int idx) {
 }
 
 // Function to borrow from previous sibling
-void borrowFromPrev(BTreeNode<T>* node, int idx) {
-    BTreeNode<T>* child = node->children[idx];
-    BTreeNode<T>* sibling = node->children[idx - 1];
+void borrowFromPrev(BTreeNode* node, int idx) {
+    BTreeNode* child = node->children[idx];
+    BTreeNode* sibling = node->children[idx - 1];
 
     for (int i = child->n - 1; i >= 0; --i)
         child->keys[i + 1] = child->keys[i];
@@ -166,9 +164,9 @@ void borrowFromPrev(BTreeNode<T>* node, int idx) {
 }
 
 // Function to borrow from next sibling
-void borrowFromNext(BTreeNode<T>* node, int idx) {
-    BTreeNode<T>* child = node->children[idx];
-    BTreeNode<T>* sibling = node->children[idx + 1];
+void borrowFromNext(BTreeNode* node, int idx) {
+    BTreeNode* child = node->children[idx];
+    BTreeNode* sibling = node->children[idx + 1];
 
     child->keys[child->n] = node->keys[idx];
 
@@ -190,9 +188,9 @@ void borrowFromNext(BTreeNode<T>* node, int idx) {
 }
 
 // Function to merge two nodes
-void merge(BTreeNode<T>* node, int idx) {
-    BTreeNode<T>* child = node->children[idx];
-    BTreeNode<T>* sibling = node->children[idx + 1];
+void merge(BTreeNode* node, int idx) {
+    BTreeNode* child = node->children[idx];
+    BTreeNode* sibling = node->children[idx + 1];
 
     child->keys[order - 1] = node->keys[idx];
 
@@ -217,15 +215,15 @@ void merge(BTreeNode<T>* node, int idx) {
 }
 
 // Function to remove a key from a non-leaf node
-void removeFromNonLeaf(BTreeNode<T>* node, int idx) {
-    T k = node->keys[idx];
+void removeFromNonLeaf(BTreeNode* node, int idx) {
+    int k = node->keys[idx];
 
     if (node->children[idx]->n >= order) {
-        T pred = getPredecessor(node, idx);
+        int pred = getPredecessor(node, idx);
         node->keys[idx] = pred;
         remove(node->children[idx], pred);
     } else if (node->children[idx + 1]->n >= order) {
-        T succ = getSuccessor(node, idx);
+        int succ = getSuccessor(node, idx);
         node->keys[idx] = succ;
         remove(node->children[idx + 1], succ);
     } else {
@@ -235,7 +233,7 @@ void removeFromNonLeaf(BTreeNode<T>* node, int idx) {
 }
 
 // Function to remove a key from a leaf node
-void removeFromLeaf(BTreeNode<T>* node, int idx) {
+void removeFromLeaf(BTreeNode* node, int idx) {
     for (int i = idx + 1; i < node->n; ++i)
         node->keys[i - 1] = node->keys[i];
 
@@ -243,7 +241,7 @@ void removeFromLeaf(BTreeNode<T>* node, int idx) {
 }
 
 // Function to remove a key from the tree
-void remove(BTreeNode<T>* node, T k) {
+void remove(BTreeNode* node, int k) {
     int idx = 0;
     while (idx < node->n && node->keys[idx] < k)
         ++idx;
@@ -272,10 +270,10 @@ void remove(BTreeNode<T>* node, T k) {
 }
 
 public:
-    BTree(int order) : order(order) { root = new BTreeNode<T>(order, true); }
+    BTree(int order) : order(order) { root = new BTreeNode(order, true); }
 
     // Function to insert a key in the tree
-    void insert(T k) {
+    void insert(int k) {
         int posicao = 0;
         for(int i=0; i<root->n; i++){
             if(root->keys[i] < k)
@@ -287,7 +285,7 @@ public:
             filhoTemEspaco = true;
 
         if (root->n == 2 * order && !filhoTemEspaco) {
-            BTreeNode<T>* s = new BTreeNode<T>(order, false);
+            BTreeNode* s = new BTreeNode(order, false);
             s->children[0] = root;
             root = s;
             splitChild(root, 0);
@@ -302,12 +300,12 @@ public:
     }
 
     // Function to search a key in the tree
-    bool search(T k) {
+    bool search(int k) {
         return (root == nullptr) ? false : search(root, k);
     }
 
     // Function to remove a key from the tree
-void remove(T k) {
+void remove(int k) {
     if (!root) {
         cout << "The tree is empty\n";
         return;
@@ -316,7 +314,7 @@ void remove(T k) {
     remove(root, k);
 
     if (root->n == 0) {
-        BTreeNode<T>* tmp = root;
+        BTreeNode* tmp = root;
         if (root->leaf)
             root = nullptr;
         else
@@ -329,7 +327,7 @@ void remove(T k) {
 };
 
 int main() {
-    BTree<int> t(2);
+    BTree t(2);
 
     t.insert(20);
     t.insert(40);
