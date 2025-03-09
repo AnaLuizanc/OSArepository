@@ -96,6 +96,21 @@ private:
         }
     }
 
+    // Function to search a key in the tree
+    bool search(BTreeNode<T>* x, T k) {
+        int i = 0;
+        while (i < x->n && k > x->keys[i])
+            i++;
+
+        if (i < x->n && k == x->keys[i])
+            return true;
+
+        if (x->leaf)
+            return false;
+
+        return search(x->children[i], k);
+    }
+
 public:
     BTree(int order) : order(order) { root = new BTreeNode<T>(order, true); }
 
@@ -126,6 +141,11 @@ public:
         cout << endl;
     }
 
+    // Function to search a key in the tree
+    bool search(T k) {
+        return (root == nullptr) ? false : search(root, k);
+    }
+
 };
 
 int main() {
@@ -153,6 +173,17 @@ int main() {
     t.insert(45);
     t.insert(25);
     t.imprimeArvore();
+
+    int key;
+    // cout << "Entre com a chave para procurar na árvore: ";
+    // cin >> key;
+    
+    bool found = t.search(key=222);
+    if (found) {
+        cout << "Key " << key << " found in the tree." << endl;
+    } else {
+        cout << "Key " << key << " not found in the tree." << endl;
+    }
 
     return 0;
 }
