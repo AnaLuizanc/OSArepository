@@ -1,6 +1,6 @@
 #include "btree.hpp"
 
-//MÉTODOS PRIVADOS
+// MÉTODOS PRIVADOS
 
 // Função para dividir um nó filho cheio
 void BTree::splitChild(BTreeNode* x, int i) { // i = posição do ponteiro do filho
@@ -254,24 +254,38 @@ void BTree::remove(BTreeNode* node, int k) {
 // MÉTODOS PÚBLICOS
 
 void BTree::insert(int k) {
-    int posicao = 0;
-    for (int i = 0; i < root->n; i++) {
-        if (root->keys[i] < k)
-            posicao++;
+    // Se a árvore estiver vazia
+    if (root == NULL){
+        // Aloca memória para a raiz
+        root = new BTreeNode(order, true);
+        root->keys[0] = k;  // Insere a chave
+        root->n = 1;  // Atualiza o número de chaves na raiz
     }
-    bool filhoTemEspaco = false;
+    else{ // Se a árvore não estiver vazia
+        // Se a raiz estiver cheia, a árvore cresce em altura
+        if (root->n == 2*order){
+            // Aloca memória para a nova raiz
+            BTreeNode *s = new BTreeNode(order, false);
 
-    if (root->children[posicao] != nullptr && root->children[posicao]->n < order * 2)
-        filhoTemEspaco = true;
+            // Faz a raiz antiga ser filha da nova raiz
+            s->children[0] = root;
 
-    if (root->n == 2 * order && !filhoTemEspaco) {
-        BTreeNode* s = new BTreeNode(order, false);
-        s->children[0] = root;
-        root = s;
-        splitChild(root, 0);
-        insertNonFull(s, k);
-    } else
-        insertNonFull(root, k);
+            // Divide a raiz antiga e move uma chave para a nova raiz
+            splitChild(s,0);
+
+            // A nova raiz tem dois filhos agora. Decide qual dos
+            // dois filhos vai receber a nova chave
+            int i = 0;
+            if (s->keys[0] < k)
+                i++;
+            insertNonFull(s->children[i], k);
+
+            // Muda a raiz
+            root = s;
+        }
+        else  // Se a raiz não estiver cheia, chama insertNonFull para a raiz
+            insertNonFull(root, k);
+    }
 }
 
 // Função para imprimir a árvore
